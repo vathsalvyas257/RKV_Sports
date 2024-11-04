@@ -68,6 +68,14 @@ export default function Home() {
                 style={{ height: '100%', objectFit: 'cover' }}
               />
             </div>
+            <div className="carousel-item" style={{ height: '500px' }}>
+              <img
+                src="https://images.unsplash.com/photo-1728467459756-211f3c738697?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw1fHx8ZW58MHx8fHx8"
+                className="d-block w-100"
+                alt="..."
+                style={{ height: '100%', objectFit: 'cover' }}
+              />
+            </div>
           </div>
           <button className="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
             <span className="carousel-control-prev-icon" aria-hidden="true"></span>
