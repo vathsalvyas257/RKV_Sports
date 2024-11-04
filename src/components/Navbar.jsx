@@ -88,7 +88,7 @@ export default function Navbar() {
                       Live Scores
                     </Link>
                   </li>
-                 
+
                   <li className="nav-item">
                     <Link
                       className={`nav-link ${
@@ -109,16 +109,32 @@ export default function Navbar() {
                       Department
                     </Link>
                   </li>
-                  <li className="nav-item">
-                    <Link
-                      className={`nav-link ${
-                        location.pathname === "/login" ? "active" : ""
-                      }`}
-                      to="/login"
-                    >
-                      Login
+                  {false ? (
+                    <li className="nav-item">
+                      <Link
+                        className={`nav-link ${
+                          location.pathname === "/login" ? "active" : ""
+                        }`}
+                        to="/login"
+                      >
+                        Login
+                      </Link>
+                    </li>
+                  ) : (
+                    <Link to="/profile">
+                      <div className="nav-item">
+                        <img
+                          src="https://th.bing.com/th/id/OIP.KitsWvuPkcEUMv3Vd1yQ9QHaHa?w=183&h=187&c=7&r=0&o=5&pid=1.7"
+                          alt="profile"
+                          style={{
+                            maxHeight: "40px",
+                            borderRadius: "50%",
+                            border: "2px solid white",
+                          }}
+                        />
+                      </div>
                     </Link>
-                  </li>
+                  )}
                 </ul>
               </div>
             </div>

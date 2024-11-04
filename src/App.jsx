@@ -8,6 +8,7 @@ import News from "./components/News";
 import Footer from "./components/Footer";
 import Dept from "./components/Dept";
 import Login from "./components/Login";
+import User from "./components/user/User";
 function App() {
   return (
     <>
@@ -21,7 +22,7 @@ function App() {
           <Route  exact path="/news" element={<News/>}/>
           <Route  exact path="/dept" element={<Dept/>}/>
           <Route  exact path="/login" element={<Login/>}/>
-
+          <Route exact path="/profile" element={<User/>}/>
         </Routes>
         <Footer/>
       </Router>
