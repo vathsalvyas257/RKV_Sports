@@ -102,7 +102,7 @@ export default function Navbar() {
               <Link to="/profile">
               <div className="nav-item">
                 <img
-                  src="https://th.bing.com/th/id/OIP.KitsWvuPkcEUMv3Vd1yQ9QHaHa?w=183&h=187&c=7&r=0&o=5&pid=1.7"
+                  src="../../public/passport.jpg"
                   alt="profile"
                   style={{
                     maxHeight: "40px",
