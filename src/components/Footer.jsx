@@ -2,7 +2,7 @@ import React from 'react';
 
 function Footer() {
   return (
-    <footer className="bg-dark text-light py-4"> {/* Increased vertical padding */}
+    <footer className="bg-dark text-light py-4 mt-4"> {/* Increased vertical padding */}
       <div className="container text-center">
         <h4 className="mb-3 fw-bold" style={{ fontSize: '1.8rem' }}>RkvSports</h4> {/* Increased font size */}
         <p className="mb-4 small" style={{ fontSize: '1rem' }}>Home for Campus Sports Excellence!</p> {/* Increased font size */}
