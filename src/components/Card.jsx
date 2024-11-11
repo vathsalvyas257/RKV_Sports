@@ -1,6 +1,11 @@
 import React from "react";
-
+import { useNavigate } from "react-router-dom";
 export default function Card(props) {
+  // console.log(props);
+  const navigate=useNavigate();
+  const handleRegister=()=>{
+    navigate(`/${props.sport}`)
+  }
   return (
     <div className="col-lg-4 col-md-6 col-sm-12 mb-4 d-flex align-items-stretch">
       <div className="card" style={{ minWidth: "18rem", height: "100%" }}>
@@ -15,9 +20,9 @@ export default function Card(props) {
           <p className="card-text flex-grow-1">
             {props.event.description}
           </p>
-          <a href="#" className="btn btn-primary mt-auto">
+          <div className="btn btn-primary mt-auto" onClick={handleRegister}>
             Register
-          </a>
+          </div>
         </div>
       </div>
     </div>

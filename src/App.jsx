@@ -22,9 +22,19 @@ function App() {
         <main className="flex-fill"> {/* Main content area */}
           <Routes>
             <Route exact path="/" element={<Home />} />
+            
+
+            {/* registration pages */}
+            <Route exact path="/hockey" element={<HockeyRegister />} />
+            <Route exact path="/cricket" element={<CricRegister />} />
+            <Route exact path="/kabaddi" element={<KabbaddiRegistration />} />
+            <Route exact path="/badminton" element={<BadmintonRegister />} />
+            <Route exact path="/basketball" element={<BasketballRegister />} />
+
+
+
             <Route exact path="/tournments" element={<Tournments />} />
             <Route exact path="/livescores" element={<Livescore />} />
-            <Route exact path="/register" element={<HockeyRegister />} />
             <Route exact path="/news" element={<News />} />
             <Route exact path="/dept" element={<Dept />} />
             <Route exact path="/login" element={<Login />} />
