@@ -67,6 +67,14 @@ export default function Navbar() {
             </li>
             <li className="nav-item">
               <Link
+                className={`nav-link ${location.pathname === "/register" ? "active" : ""}`}
+                to="/register"
+              >
+              Register
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link
                 className={`nav-link ${location.pathname === "/livescores" ? "active" : ""}`}
                 to="/livescores"
               >

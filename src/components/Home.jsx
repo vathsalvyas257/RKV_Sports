@@ -1,128 +1,117 @@
-import React, { useState } from 'react';
-import Card from "./Card";
-import ViewMore from "./ViewMore";
+import React, { useState, useEffect } from "react";
+
 export default function Home() {
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      title: "Soccer Tournament",
-      date: "2023-11-12",
-      description: "Annual soccer tournament for all skill levels.",
-      imgUrl: "https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400"
-    },
-    {
-      id: 2,
-      title: "Basketball Match",
-      date: "2023-11-15",
-      description: "Friendly match between senior and junior teams.",
-      imgUrl: "https://images.unsplash.com/photo-1517649763962-0c623066013b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400"
-    },
-    {
-      id: 3,
-      title: "Cricket Finals",
-      date: "2023-11-20",
-      description: "Cricket finals between top two teams of the season.",
-      imgUrl: "https://images.unsplash.com/photo-1521412644187-c49fa049e84d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400"
-    },
-    {
-      id: 4,
-      title: "Badminton Open",
-      date: "2023-11-25",
-      description: "Open badminton tournament for doubles.",
-      imgUrl: "https://images.unsplash.com/photo-1534438327276-c2b7d84b14a5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400"
-    }
-  ]);
+  // Define image arrays
+  const carouselImages = [
+    "https://images.unsplash.com/photo-1721332153370-56d7cc352d63?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxfHx8ZW58MHx8fHx8",
+    "https://images.unsplash.com/photo-1721332153370-56d7cc352d63?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxfHx8ZW58MHx8fHx8",
+    "https://images.unsplash.com/photo-1728467459756-211f3c738697?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw1fHx8ZW58MHx8fHx8",
+  ];
+
+  const profileImages = [
+    "../../public/passport.jpg",
+    "https://images.unsplash.com/photo-1521412644187-c49fa049e84d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
+  ];
+
+  const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
+  const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
+
+  useEffect(() => {
+    // Set up intervals for the carousel images
+    const carouselInterval = setInterval(() => {
+      setCurrentCarouselIndex((prevIndex) => (prevIndex + 1) % carouselImages.length);
+    }, 1500); // Change every 1.5 seconds
+
+    // Set up intervals for the profile images
+    const profileInterval = setInterval(() => {
+      setCurrentProfileIndex((prevIndex) => (prevIndex + 1) % profileImages.length);
+    }, 3000); // Change every 3 seconds
+
+    // Clear intervals on cleanup
+    return () => {
+      clearInterval(carouselInterval);
+      clearInterval(profileInterval);
+    };
+  }, []);
 
   return (
-    <div className='container my-2'>
+    <div className="container ">
+      {/* Carousel Section */}
       <div className="row">
         <div
           id="carouselExampleControls"
           className="carousel slide"
           data-bs-ride="carousel"
-          data-bs-interval="1500"
-          style={{ maxHeight: '500px' }}
+          style={{ maxHeight: "500px" }}
         >
           <div className="carousel-inner">
-            <div className="carousel-item active" style={{ height: '500px' }}>
+            <div className="carousel-item active" style={{ height: "500px" }}>
               <img
-                src="https://images.unsplash.com/photo-1721332153370-56d7cc352d63?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxfHx8ZW58MHx8fHx8"
+                src={carouselImages[currentCarouselIndex]}
                 className="d-block w-100"
-                alt="..."
-                style={{ height: '100%', objectFit: 'cover' }}
-              />
-            </div>
-            <div className="carousel-item" style={{ height: '500px' }}>
-              <img
-                src="https://images.unsplash.com/photo-1721332153370-56d7cc352d63?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxfHx8ZW58MHx8fHx8"
-                className="d-block w-100"
-                alt="..."
-                style={{ height: '100%', objectFit: 'cover' }}
-              />
-            </div>
-            <div className="carousel-item" style={{ height: '500px' }}>
-              <img
-                src="https://images.unsplash.com/photo-1728467459756-211f3c738697?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw1fHx8ZW58MHx8fHx8"
-                className="d-block w-100"
-                alt="..."
-                style={{ height: '100%', objectFit: 'cover' }}
-              />
-            </div>
-            <div className="carousel-item" style={{ height: '500px' }}>
-              <img
-                src="https://images.unsplash.com/photo-1728467459756-211f3c738697?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw1fHx8ZW58MHx8fHx8"
-                className="d-block w-100"
-                alt="..."
-                style={{ height: '100%', objectFit: 'cover' }}
+                alt="Carousel Slide"
+                style={{ height: "100%", objectFit: "cover" }}
               />
             </div>
           </div>
-          <button className="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
-            <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span className="visually-hidden">Previous</span>
-          </button>
-          <button className="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
-            <span className="carousel-control-next-icon" aria-hidden="true"></span>
-            <span className="visually-hidden">Next</span>
-          </button>
-        </div>      
-      </div>
-      <h2 className='my-3 text-center'>Upcoming Tournaments</h2>
-      <div className="row">
-        {/* Render events using the Card component */}
-        <div className='d-flex my-3'>
-        {events.slice(0,2).map(event => (
-          <div className="col-md-4 m-1">
-          <Card key={event.id} event={event} />
-          </div>
-          
-        ))}
-        <div className='col-md-4'>
-        <ViewMore path="/tournments"></ViewMore>
-        </div>
-        </div>
-        <div className="container">
         </div>
       </div>
 
-      {/* news */}
-      <h2 className='my-3 text-center'>Latest News</h2>
-      <div className="row">
-        {/* Render events using the Card component */}
-        <div className='d-flex my-3'>
-        {events.slice(0,2).map(event => (
-          <div className="col-md-4 m-1">
-          <Card key={event.id} event={event} />
-          </div>
-          
-        ))}
-        <div className='col-md-4'>
-        <ViewMore path="/news"></ViewMore>
+      {/* Profile Image and Description Section */}
+      <div className="container my-5 d-flex flex-column flex-md-row align-items-center" style={{ padding: "1rem" }}>
+        <div className="col-12 col-md-6 d-flex flex-column align-items-center mb-3 mb-md-0 ">
+          <img
+            src={profileImages[currentProfileIndex]}
+            className="card-img-top"
+            alt="Profile"
+            style={{
+              width: "300px",
+              height: "300px",
+              objectFit: "cover",
+              margin: "1rem auto",
+              borderRadius: "30px", // Controls roundness
+            }}
+          />
         </div>
+        <div className="col-12 col-md-6">
+          <p className="text-muted">
+            This is the brief description about the tournament. Join us for an exciting tournament filled with action and enthusiasm. Compete, showcase your skills, and be a part of this thrilling sports event!
+            <br/><a href="/">view more</a>
+          </p>
         </div>
-        <div className="container">
+      </div>
+
+      {/* Divider Line */}
+      <hr
+        style={{
+          border: "none",
+          borderTop: "3px solid #4a90e2", // Customize color to suit the theme
+          width: "80%", // Adjust width to control line length
+          margin: "2rem auto", // Center the line with margin
+        }}
+      />
+
+      {/* Additional Info Section */}
+      <div className="container my-5 d-flex flex-column flex-md-row align-items-center" style={{ padding: "1rem" }}>
+        <div className="col-12 col-md-6">
+          <p className="text-muted">
+            Stay tuned for more updates on upcoming tournaments. Don’t miss the chance to compete and make memories in our grand sports events!<br/><a href='/'>view more</a>
+          </p>
         </div>
-        
+        <div className="col-12 col-md-6 d-flex flex-column align-items-center mb-3 mb-md-0 ">
+          <img
+            src={profileImages[currentProfileIndex]}
+            className="card-img-top"
+            alt="Profile"
+            style={{
+              width: "300px",
+              height: "300px",
+              objectFit: "cover",
+              margin: "1rem auto",
+              borderRadius: "30px",
+            }}
+          />
+        </div>
       </div>
     </div>
   );
