@@ -14,8 +14,10 @@ import CricRegister from "./components/CricRegister";
 import BasketballRegister from "./components/BasketballRegister";
 import BadmintonRegister from "./components/BadmintonRegister";
 import HockeyRegister from "./components/HockeyRegister";
+import SportsState from "./components/context/SportsState";
 function App() {
   return (
+    <SportsState>
     <Router>
       <div className="d-flex flex-column min-vh-100"> {/* Flexbox layout */}
         <Navbar />
@@ -45,6 +47,7 @@ function App() {
         <Footer />
       </div>
     </Router>
+    </SportsState>
   );
 }
 
