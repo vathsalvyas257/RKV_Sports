@@ -15,10 +15,13 @@ import BasketballRegister from "./components/BasketballRegister";
 import BadmintonRegister from "./components/BadmintonRegister";
 import HockeyRegister from "./components/HockeyRegister";
 import SportsState from "./components/context/SportsState";
+import AuthState from "./components/context/AuthState";
 function App() {
   return (
+    
     <SportsState>
     <Router>
+    <AuthState>
       <div className="d-flex flex-column min-vh-100"> {/* Flexbox layout */}
         <Navbar />
         <main className="flex-fill"> {/* Main content area */}
@@ -46,8 +49,10 @@ function App() {
         </main>
         <Footer />
       </div>
+      </AuthState>
     </Router>
     </SportsState>
+    
   );
 }
 

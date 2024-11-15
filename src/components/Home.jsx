@@ -1,16 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // Import carousel styles
+import SportsContext from "./context/SportsContext";
 
 export default function Home() {
-  const [carouselImages, setCarouselImages] = useState([
-    {
-      id: "1",
-      src: "https://images.unsplash.com/photo-1521412644187-c49fa049e84d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
-    },
-    { id: "2", src: "/passport.jpg" },
-  ]);
-
+  const {carouselImages,addCarouselImage}=useContext(SportsContext);
+  console.log(carouselImages);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imageId, setImageId] = useState("");
   const [uploadedImage, setUploadedImage] = useState(null);
@@ -24,6 +19,7 @@ export default function Home() {
 
   const handleAddImage = () => {
     if (imageId && uploadedImage) {
+      addCarouselImage({imageId,uploadedImage})
       setCarouselImages([
         ...carouselImages,
         { id: imageId, src: uploadedImage },
@@ -69,7 +65,7 @@ export default function Home() {
           {carouselImages.map((image) => (
             <div key={image.id} style={{ width: "100vw" }}>
               <img
-                src={image.src}
+                src={image.banner_link}
                 alt={`Slide ${image.id}`}
                 style={{
                   width: "100vw",

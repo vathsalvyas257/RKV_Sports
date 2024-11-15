@@ -1,7 +1,7 @@
 import SportsContext from "./SportsContext";
 import React, { useState, useEffect } from 'react';
 
-const url = "http://localhost:8000";
+const url = "http://127.0.0.1:8000";
 
 const SportsState = (props) => {
   const [carouselImages, setCarouselImages] = useState([]);
@@ -9,7 +9,7 @@ const SportsState = (props) => {
   // Fetch all carousel images
   const getCarouselImages = async () => {
     try {
-      const response = await fetch(`${url}/getBanners`);
+      const response = await fetch(`${url}/banner/`);
       if (response.ok) {
         const images = await response.json();
         setCarouselImages(images);
@@ -24,7 +24,7 @@ const SportsState = (props) => {
   // Add a new carousel image
   const addCarouselImage = async (imageData) => {
     try {
-      const response = await fetch(`${url}/addBanner`, {
+      const response = await fetch(`${url}/banner/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -46,7 +46,7 @@ const SportsState = (props) => {
   // Delete a carousel image by ID
   const deleteCarouselImage = async (imageId) => {
     try {
-      const response = await fetch(`${url}/deleteBanner/${imageId}`, {
+      const response = await fetch(`${url}/banner/${imageId}`, {
         method: "DELETE",
       });
 
@@ -63,7 +63,7 @@ const SportsState = (props) => {
   // Update a carousel image by ID
   const updateCarouselImage = async (imageId, updatedData) => {
     try {
-      const response = await fetch(`${url}/updateBanner/${imageId}`, {
+      const response = await fetch(`${url}/banner/${imageId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"
@@ -90,7 +90,7 @@ const SportsState = (props) => {
   useEffect(() => {
     getCarouselImages();
   }, []);
-
+  console.log(carouselImages);
   return (
     <SportsContext.Provider
       value={{

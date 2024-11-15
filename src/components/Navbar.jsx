@@ -90,7 +90,7 @@ export default function Navbar() {
                 Department
               </Link>
             </li>
-            {false ? (
+            {!localStorage.getItem("token") ? (
               <li className="nav-item">
                 <Link
                   className={`nav-link ${location.pathname === "/login" ? "active" : ""}`}
