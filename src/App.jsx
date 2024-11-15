@@ -16,6 +16,9 @@ import BadmintonRegister from "./components/BadmintonRegister";
 import HockeyRegister from "./components/HockeyRegister";
 import SportsState from "./components/context/SportsState";
 import AuthState from "./components/context/AuthState";
+import AdminPage from "./components/Admin/AdminPage";
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 function App() {
   return (
     
@@ -41,7 +44,7 @@ function App() {
             <Route exact path="/tournments" element={<Tournments />} />
             <Route exact path="/livescores" element={<Livescore />} />
             <Route exact path="/news" element={<News />} />
-            <Route exact path="/dept" element={<Dept />} />
+            <Route exact path="/dept" element={<AdminPage />} />
             <Route exact path="/login" element={<Login />} />
             <Route exact path="/profile" element={<User />} />
             <Route exact path="/signup" element={<SignupPage />} />
