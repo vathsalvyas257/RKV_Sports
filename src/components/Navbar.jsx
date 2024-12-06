@@ -1,23 +1,28 @@
-import React, { useEffect } from "react";
-import { useLocation, Link } from "react-router-dom";
+import React, { useContext } from "react";
+import { useLocation, Link, useNavigate } from "react-router-dom";
+import AuthContext from "./context/AuthContext";
 
 export default function Navbar() {
   const location = useLocation();
+  const { userIn,user } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    // Automatic activation of elements upon click
-  }, [location]);
+  const isActive = (path) => (location.pathname === path ? "active" : "");
+
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("student_id");
+    localStorage.removeItem("refreshToken");
+    // window.location.reload();
+    navigate("/login");
+  };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
       <div className="container-fluid">
-        {/* Logo and Title Section aligned to the left */}
+        {/* Logo and Title Section */}
         <div className="d-flex align-items-center">
-          <img
-            src="../public/rgukt_logo.png"
-            alt="logo"
-            style={{ maxHeight: "50px" }}
-          />
+          <img src="/rgukt_logo.png" alt="logo" style={{ maxHeight: "50px" }} />
           <span
             className="navbar-brand fw-bold ms-2"
             style={{
@@ -34,7 +39,7 @@ export default function Navbar() {
           </span>
         </div>
 
-        {/* Navigation Links aligned to the right */}
+        {/* Navigation Links */}
         <button
           className="navbar-toggler ms-auto"
           type="button"
@@ -49,70 +54,79 @@ export default function Navbar() {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <Link
-                className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
-                aria-current="page"
-                to="/"
-              >
+              <Link className={`nav-link ${isActive("/")}`} to="/">
                 Home
               </Link>
             </li>
             <li className="nav-item">
-              <Link
-                className={`nav-link ${location.pathname === "/tournaments" ? "active" : ""}`}
-                to="/tournments"
-              >
+              <Link className={`nav-link ${isActive("/tournaments")}`} to="/tournaments">
                 Tournaments
               </Link>
             </li>
-            
             <li className="nav-item">
-              <Link
-                className={`nav-link ${location.pathname === "/livescores" ? "active" : ""}`}
-                to="/livescores"
-              >
+              <Link className={`nav-link ${isActive("/livescores")}`} to="/livescores">
                 Live Scores
               </Link>
             </li>
             <li className="nav-item">
-              <Link
-                className={`nav-link ${location.pathname === "/news" ? "active" : ""}`}
-                to="/news"
-              >
+              <Link className={`nav-link ${isActive("/news")}`} to="/news">
                 News
               </Link>
             </li>
             <li className="nav-item">
-              <Link
-                className={`nav-link ${location.pathname === "/dept" ? "active" : ""}`}
-                to="/dept"
-              >
+              <Link className={`nav-link ${isActive("/dept")}`} to="/dept">
                 Department
               </Link>
             </li>
-            {!localStorage.getItem("token") ? (
+            {localStorage.getItem("student_id")? (
+              <li className="nav-item dropdown">
+                <a
+                  className="nav-link dropdown-toggle"
+                  href="#"
+                  id="navbarDropdown"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <img
+                    src={user.profileImage || "/default-avatar.png"}
+                    alt="profile"
+                    style={{
+                      maxHeight: "40px",
+                      borderRadius: "50%",
+                      border: "2px solid white",
+                    }}
+                  />
+                  <span className="ms-2">{user.student_name}</span>
+                </a>
+                <ul
+                  className="dropdown-menu dropdown-menu-end"
+                  aria-labelledby="navbarDropdown"
+                >
+                  <li>
+                    <Link className="dropdown-item" to="/profile">
+                      My Profile
+                    </Link>
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </button>
+                  </li>
+                </ul>
+              </li>
+            ) : (
               <li className="nav-item">
                 <Link
-                  className={`nav-link ${location.pathname === "/login" ? "active" : ""}`}
+                  className={`nav-link ${isActive("/login")}`}
                   to="/login"
                 >
                   Login
                 </Link>
               </li>
-            ) : (
-              <Link to="/profile">
-              <div className="nav-item">
-                <img
-                  src="../../public/passport.jpg"
-                  alt="profile"
-                  style={{
-                    maxHeight: "40px",
-                    borderRadius: "50%",
-                    border: "2px solid white",
-                  }}
-                />
-              </div>
-              </Link>
             )}
           </ul>
         </div>

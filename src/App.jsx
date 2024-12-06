@@ -8,7 +8,7 @@ import Footer from "./components/Footer";
 import Dept from "./components/Dept";
 import Login from "./components/Login";
 import User from "./components/user/User";
-import SignupPage from "./components/Signup";
+import Signup from "./components/Signup";
 import KabbaddiRegistration from "./components/KabbaddiRegistration";
 import CricRegister from "./components/CricRegister";
 import BasketballRegister from "./components/BasketballRegister";
@@ -41,13 +41,13 @@ function App() {
 
 
 
-            <Route exact path="/tournments" element={<Tournments />} />
+            <Route exact path="/tournaments" element={<Tournments />} />
             <Route exact path="/livescores" element={<Livescore />} />
             <Route exact path="/news" element={<News />} />
             <Route exact path="/dept" element={<AdminPage />} />
             <Route exact path="/login" element={<Login />} />
             <Route exact path="/profile" element={<User />} />
-            <Route exact path="/signup" element={<SignupPage />} />
+            <Route exact path="/signup" element={<Signup />} />
           </Routes>
         </main>
         <Footer />

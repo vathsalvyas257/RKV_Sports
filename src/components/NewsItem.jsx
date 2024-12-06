@@ -1,38 +1,42 @@
 import React, { useState } from 'react';
 
-function NewsItem({ newsItem, onDelete }) {
+function NewsItem({ news, onDelete, onUpdate }) {
   const [isModalOpen, setIsModalOpen] = useState(false); // To toggle modal visibility
-  const [title, setTitle] = useState(newsItem.title); // News title
-  const [imageSrc, setImageSrc] = useState(newsItem.imageSrc); // Initial image URL
-  const [description, setDescription] = useState(newsItem.description); // News description
+  const [title, setTitle] = useState(news.title); // News title
+  const [imageSrc, setImageSrc] = useState(news.news_image_url); // Image URL
+  const [description, setDescription] = useState(news.news_content); // News content
 
   // Functions to handle modal actions
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
   const handleSave = () => {
-    // Save updated information (could also involve API calls to save to a backend)
-    closeModal();
+    const updatedNews = {
+      ...news,
+      title,
+      news_image_url: imageSrc,
+      news_content: description,
+    };
+    onUpdate(updatedNews); // Update the news item
+    closeModal(); // Close the modal
   };
 
   const handleDelete = () => {
-    onDelete(newsItem.id); // Call onDelete function passed from the parent to delete this news item
+    onDelete(news._id); // Call onDelete function passed from the parent to delete this news item
   };
 
   return (
-    <div>
-      <div className="card mb-3" style={{ maxWidth: "540px" }}>
-        <div className="row g-0">
-          <div className="col-md-4">
-            <img src={imageSrc} className="img-fluid rounded-start" alt="News" />
-          </div>
-          <div className="col-md-8">
-            <div className="card-body">
-              <h5 className="card-title">{title}</h5>
-              <p className="card-text">{description}</p>
-              <button onClick={openModal} className="btn btn-primary me-2">Edit News</button>
-              <button onClick={handleDelete} className="btn btn-danger">Delete News</button>
-            </div>
+    <div className="card mb-3" style={{ maxWidth: "540px" }}>
+      <div className="row g-0">
+        <div className="col-md-4">
+          <img src={imageSrc} className="img-fluid rounded-start" alt="News" />
+        </div>
+        <div className="col-md-8">
+          <div className="card-body">
+            <h5 className="card-title">{title}</h5>
+            <p className="card-text">{description}</p>
+            <button onClick={openModal} className="btn btn-primary me-2">Edit News</button>
+            <button onClick={handleDelete} className="btn btn-danger">Delete News</button>
           </div>
         </div>
       </div>
@@ -93,24 +97,4 @@ function NewsItem({ newsItem, onDelete }) {
   );
 }
 
-function NewsList() {
-  const [newsItems, setNewsItems] = useState([
-    { id: 1, title: "Card title 1", imageSrc: "image1.jpg", description: "Description 1" },
-    { id: 2, title: "Card title 2", imageSrc: "image2.jpg", description: "Description 2" },
-    { id: 3, title: "Card title 3", imageSrc: "image3.jpg", description: "Description 3" }
-  ]);
-
-  const handleDeleteNews = (id) => {
-    setNewsItems(newsItems.filter(newsItem => newsItem.id !== id));
-  };
-
-  return (
-    <div>
-      {newsItems.map(newsItem => (
-        <NewsItem key={newsItem.id} newsItem={newsItem} onDelete={handleDeleteNews} />
-      ))}
-    </div>
-  );
-}
-
-export default NewsList;
+export default NewsItem;

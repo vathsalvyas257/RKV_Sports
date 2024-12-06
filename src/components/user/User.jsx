@@ -71,7 +71,7 @@ export default function User() {
   };
 
   useEffect(() => {
-    getDetails("R200120");
+    getDetails(localStorage.getItem("student_id"));
   }, []);
 
   if (error) {
