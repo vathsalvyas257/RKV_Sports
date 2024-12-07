@@ -1,66 +1,57 @@
 import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
+import './CreateNewsModal.css';
 
-export default function CreateNewsModal({ onClose }) {
+export default function CreateNewsModal({ onClose, setAlert, addNewNews }) {
   const [formData, setFormData] = useState({
     newsTitle: '',
-    sportType: 'cricket', // Default sport type
+    sportType: 'cricket',
     description: '',
     image: null,
   });
 
-  const [isLoading, setIsLoading] = useState(false); // State for loading spinner
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
+    if (!formData.newsTitle || !formData.sportType || !formData.description || !formData.image) {
+      setAlert("All fields are required.", "error");
+      return;
+    }
+
     setIsLoading(true);
 
-    // Create a FormData object
     const form = new FormData();
     form.append('title', formData.newsTitle);
     form.append('sport_type', formData.sportType);
     form.append('news_content', formData.description);
     form.append('news_image', formData.image);
 
-    const handleSubmit = async () => {
-      if (!formData.newsTitle || !formData.sportType || !formData.description || !formData.image) {
-        alert('All fields are required.');
-        return;
+    try {
+      const response = await fetch('http://127.0.0.1:8000/News/', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+        },
+        body: form,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setAlert("News Created Successfully!", "success");
+
+        // Call the parent function to add the newly created news to the list
+        addNewNews(data); // Assuming 'data' contains the created news object
+
+        onClose();
+      } else {
+        setAlert(data.detail || 'Failed to create news.', "error");
       }
-    
-      setIsLoading(true);
-    
-      const form = new FormData();
-      form.append('title', formData.newsTitle);
-      form.append('sport_type', formData.sportType);
-      form.append('news_content', formData.description);
-      form.append('news_image', formData.image);
-    
-      try {
-        const response = await fetch('http://127.0.0.1:8000/News/', {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-          },
-          body: form,
-        });
-    
-        const data = await response.json();
-    
-        if (response.ok) {
-          alert('News Created Successfully!');
-          onClose(); // Close modal after submitting
-        } else {
-          console.error('Failed to create news:', data);
-          alert(`Error: ${data.message || 'Failed to create news'}`);
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while creating news.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
+    } catch (error) {
+      setAlert('An error occurred while creating news.', "error");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -74,7 +65,6 @@ export default function CreateNewsModal({ onClose }) {
             <Form.Label>News Title</Form.Label>
             <Form.Control
               type="text"
-              name="title" // Added name attribute
               placeholder="Enter news title"
               value={formData.newsTitle}
               onChange={(e) =>
@@ -87,7 +77,6 @@ export default function CreateNewsModal({ onClose }) {
             <Form.Label>Sport Type</Form.Label>
             <Form.Control
               as="select"
-              name="sport_type" // Added name attribute
               value={formData.sportType}
               onChange={(e) =>
                 setFormData({ ...formData, sportType: e.target.value })
@@ -105,7 +94,6 @@ export default function CreateNewsModal({ onClose }) {
             <Form.Label>Description</Form.Label>
             <Form.Control
               as="textarea"
-              name="news_content" // Added name attribute
               rows={3}
               placeholder="Enter news description"
               value={formData.description}
@@ -115,11 +103,10 @@ export default function CreateNewsModal({ onClose }) {
             />
           </Form.Group>
 
-          <Form.Group controlId="formImage">
+          <Form.Group controlId="formFile">
             <Form.Label>Upload Image</Form.Label>
             <Form.Control
               type="file"
-              name="news_image" // Added name attribute
               onChange={(e) =>
                 setFormData({ ...formData, image: e.target.files[0] })
               }
@@ -128,11 +115,11 @@ export default function CreateNewsModal({ onClose }) {
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onClose} disabled={isLoading}>
+        <Button variant="secondary" onClick={onClose}>
           Close
         </Button>
         <Button variant="primary" onClick={handleSubmit} disabled={isLoading}>
-          {isLoading ? 'Creating...' : 'Create News'}
+          {isLoading ? "Creating..." : "Create News"}
         </Button>
       </Modal.Footer>
     </Modal>

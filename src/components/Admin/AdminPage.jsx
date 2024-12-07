@@ -1,10 +1,24 @@
 import React, { useState } from "react";
 import CreateTournamentModal from "./CreateTournamentModal";
 import CreateNewsModal from "./CreateNewsModal";
+import Alert from "react-bootstrap/Alert";
+import AdminNews from "./AdminNews";
 
 export default function AdminPage() {
   const [showTournamentModal, setShowTournamentModal] = useState(false);
   const [showNewsModal, setShowNewsModal] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("");
+
+  // Function to show alerts
+  const setAlert = (message, type) => {
+    setAlertMessage(message);
+    setAlertType(type);
+    setTimeout(() => {
+      setAlertMessage("");
+      setAlertType("");
+    }, 3000); // Hide the alert after 3 seconds
+  };
 
   return (
     <div className="container mt-4">
@@ -48,11 +62,32 @@ export default function AdminPage() {
         </div>
       </div>
 
+      {/* Display Alert Messages */}
+      {alertMessage && (
+        <Alert
+          variant={alertType}
+          style={{
+            position: "fixed",
+            bottom: 20,
+            right: 20,
+            zIndex: 9999,
+          }}
+        >
+          {alertMessage}
+        </Alert>
+      )}
+
+      {/* AdminNews Component */}
+      <AdminNews setAlert={setAlert} />
+
       {showTournamentModal && (
         <CreateTournamentModal onClose={() => setShowTournamentModal(false)} />
       )}
       {showNewsModal && (
-        <CreateNewsModal onClose={() => setShowNewsModal(false)} />
+        <CreateNewsModal
+          onClose={() => setShowNewsModal(false)}
+          setAlert={setAlert}
+        />
       )}
     </div>
   );
