@@ -1,28 +1,21 @@
 import React, { useState, useEffect } from "react";
-import Alert from "react-bootstrap/Alert";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 
-export default function AdminNews({ setAlert }) {
-  const [allNews, setAllNews] = useState([]); // To store all news
+export default function AdminNews({ setAlert, fetchNews }) {
+  const [allNews, setAllNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [createModalVisible, setCreateModalVisible] = useState(false); // Modal to create news
   const [currentEditNews, setCurrentEditNews] = useState(null);
-  const [newNews, setNewNews] = useState({
-    title: "",
-    news_content: "",
-    news_image: "",
-    category: "",
-  });
 
-  // Fetch the latest news from the API
-  const fetchNews = async () => {
+  // Fetch all news and display latest first
+  const fetchAllNews = async () => {
     try {
       const response = await fetch("http://127.0.0.1:8000/News/");
       const data = await response.json();
       if (response.ok) {
-        setAllNews(data.slice(0, 5).reverse()); // Limit to latest 5 and reverse the order
+        // Reverse the order to show latest created news first
+        setAllNews(data.reverse());
       } else {
         setAlert("No news found.", "warning");
       }
@@ -34,28 +27,39 @@ export default function AdminNews({ setAlert }) {
     }
   };
 
-  // Function to create news
-  const createNews = async () => {
+  const updateNews = async () => {
+    if (!currentEditNews) return;
+
     try {
-      const response = await fetch("http://127.0.0.1:8000/News/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newNews),
-      });
+      const response = await fetch(
+        `http://127.0.0.1:8000/News/?title=${encodeURIComponent(
+          currentEditNews.title
+        )}&news_content=${encodeURIComponent(currentEditNews.news_content)}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create news.");
+        throw new Error(errorData.message || "Failed to update news.");
       }
 
       const data = await response.json();
-      setAllNews((prevNews) => [newNews, ...prevNews]);
-      setAlert("News created successfully.", "success");
-      setCreateModalVisible(false); // Close the modal after successful creation
-      setNewNews({ title: "", news_content: "", news_image: "", category: "" }); // Clear form data
+      setAllNews((prevNews) =>
+        prevNews.map((news) =>
+          news.title === currentEditNews.title
+            ? { ...news, news_content: currentEditNews.news_content }
+            : news
+        )
+      );
+      setAlert(data.message || "News updated successfully.", "success");
     } catch (error) {
-      console.error("Error creating news:", error);
-      setAlert(error.message, "danger"); // Use the error message from the backend
+      console.error("Error updating news:", error);
+      setAlert(error.message, "danger");
+    } finally {
+      setEditModalVisible(false);
     }
   };
 
@@ -65,9 +69,10 @@ export default function AdminNews({ setAlert }) {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });
-      const data = await response.json();
+
       if (response.ok) {
         setAllNews((prevNews) => prevNews.filter((news) => news.title !== title));
+        const data = await response.json();
         setAlert(data.message, "success");
       } else {
         setAlert("Failed to delete the news.", "danger");
@@ -78,49 +83,23 @@ export default function AdminNews({ setAlert }) {
     }
   };
 
-  const updateNews = async (updatedNews) => {
-    const { title, news_content } = updatedNews;
-    try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/News/?title=${title}&news_content=${news_content}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-      const data = await response.json();
-      if (response.ok) {
-        setAllNews((prevNews) =>
-          prevNews.map((news) =>
-            news.title === title ? { ...news, news_content } : news
-          )
-        );
-        setAlert("News updated successfully.", "success");
-      } else {
-        setAlert("Failed to update the news.", "danger");
-      }
-    } catch (error) {
-      console.error("Error updating news:", error);
-      setAlert("Error updating news. Please try again later.", "danger");
-    } finally {
-      setEditModalVisible(false);
-    }
-  };
-
   useEffect(() => {
-    fetchNews(); // Fetch news when the component loads
+    fetchAllNews();
   }, []);
 
   return (
     <div className="mt-4">
       <h3 className="text-primary mb-3">Latest News</h3>
-
-      {/* Horizontal News Section */}
       <div
         className="d-flex"
         style={{
-          overflowX: "auto", // Allows horizontal scrolling
+          overflowX: "auto",
           maxWidth: "100%",
+          padding: "10px",
+          gap: "20px",
+          scrollSnapType: "x mandatory",
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
         }}
       >
         {loading ? (
@@ -131,56 +110,47 @@ export default function AdminNews({ setAlert }) {
               key={index}
               className="card shadow-sm border-0 mb-4"
               style={{
-                width: "350px", // Increased width for each card
-                marginLeft: "20px",
+                minWidth: "350px",
+                flexShrink: 0,
+                scrollSnapAlign: "start",
                 display: "flex",
-                flexDirection: "row", // Flex to align items horizontally
-                height: "250px", // Increased height for consistency
-                alignItems: "center", // Vertically center the content
+                flexDirection: "row",
+                height: "250px",
+                alignItems: "center",
               }}
             >
-              {/* Image on the left */}
               <img
-                src={news.news_image || "./rgukt_logo.png"} // Fallback image
+                src={news.news_image || "./rgukt_logo.png"}
                 className="card-img-left"
                 alt={news.title}
                 style={{
-                  width: "120px", // Increased image width
-                  height: "120px", // Increased image height
-                  objectFit: "cover", // Maintain aspect ratio of image
+                  width: "120px",
+                  height: "120px",
+                  objectFit: "cover",
                 }}
-                onError={(e) =>
-                  (e.target.src = "https://via.placeholder.com/150")
-                } // Fallback image on error
+                onError={(e) => (e.target.src = "https://via.placeholder.com/150")}
               />
-
-              {/* Content on the right */}
               <div className="card-body" style={{ paddingLeft: "15px" }}>
                 <h5 className="card-title" style={{ fontSize: "18px" }}>
                   {news.title}
                 </h5>
+                {news.category && (
+                  <div className="badge bg-secondary mb-2" style={{ fontSize: "12px" }}>
+                    {news.category}
+                  </div>
+                )}
                 <p
                   className="card-text"
                   style={{
                     fontSize: "14px",
                     color: "#555",
-                    height: "80px", // Increased height of the description
-                    overflow: "hidden", // Hide overflow content
+                    height: "80px",
+                    overflow: "hidden",
                   }}
                 >
                   {news.news_content}
                 </p>
-                {/* Display Sports Category */}
-                {news.category && (
-                  <div
-                    className="badge bg-secondary"
-                    style={{ fontSize: "12px" }}
-                  >
-                    {news.category}
-                  </div>
-                )}
                 <div className="mt-3">
-                  {/* Edit and Delete Buttons */}
                   <button
                     className="btn btn-primary btn-sm me-2"
                     onClick={() => {
@@ -201,87 +171,49 @@ export default function AdminNews({ setAlert }) {
             </div>
           ))
         ) : (
-          <div>No news available.</div>
+          <div>No news available</div>
         )}
       </div>
 
-      {/* Create News Modal */}
-      {createModalVisible && (
-        <Modal
-          show={createModalVisible}
-          onHide={() => setCreateModalVisible(false)}
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>Create News</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                createNews();
-              }}
-            >
-              <div className="mb-3">
-                <label className="form-label">Title</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={newNews.title}
-                  onChange={(e) =>
-                    setNewNews({ ...newNews, title: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Content</label>
-                <textarea
-                  className="form-control"
-                  rows="3"
-                  value={newNews.news_content}
-                  onChange={(e) =>
-                    setNewNews({ ...newNews, news_content: e.target.value })
-                  }
-                  required
-                ></textarea>
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Image URL</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={newNews.news_image}
-                  onChange={(e) =>
-                    setNewNews({ ...newNews, news_image: e.target.value })
-                  }
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Category</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={newNews.category}
-                  onChange={(e) =>
-                    setNewNews({ ...newNews, category: e.target.value })
-                  }
-                />
-              </div>
-              <div className="d-flex justify-content-between">
-                <Button
-                  variant="secondary"
-                  onClick={() => setCreateModalVisible(false)}
-                >
-                  Close
-                </Button>
-                <Button variant="primary" type="submit">
-                  Create News
-                </Button>
-              </div>
-            </form>
-          </Modal.Body>
-        </Modal>
-      )}
+      <Modal show={editModalVisible} onHide={() => setEditModalVisible(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit News</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div>
+            <input
+              type="text"
+              value={currentEditNews?.title || ""}
+              onChange={(e) =>
+                setCurrentEditNews({
+                  ...currentEditNews,
+                  title: e.target.value,
+                })
+              }
+              className="form-control mb-3"
+            />
+            <textarea
+              value={currentEditNews?.news_content || ""}
+              onChange={(e) =>
+                setCurrentEditNews({
+                  ...currentEditNews,
+                  news_content: e.target.value,
+                })
+              }
+              className="form-control"
+              rows="5"
+            />
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setEditModalVisible(false)}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={updateNews}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

@@ -4,6 +4,7 @@ export default function News() {
   const [newsData, setNewsData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(""); // Store selected category
 
   useEffect(() => {
     // Fetch news data from the backend API
@@ -15,7 +16,8 @@ export default function News() {
         return response.json();
       })
       .then((data) => {
-        setNewsData(data);
+        console.log("Fetched Data:", data); // Check the fetched data structure
+        setNewsData(data.reverse()); // Reverse the fetched news data
         setIsLoading(false);
       })
       .catch((error) => {
@@ -25,55 +27,101 @@ export default function News() {
       });
   }, []);
 
-  // Group news by sport type
-  const groupedNews = newsData.reduce((acc, news) => {
-    acc[news.sport_type] = acc[news.sport_type] || [];
-    acc[news.sport_type].push(news);
-    return acc;
-  }, {});
+  // Filter news based on the selected category (sport type)
+  const filteredNews = selectedCategory
+    ? newsData.filter((news) => news.sport_type.toLowerCase() === selectedCategory.toLowerCase())
+    : newsData;
+
+  // Predefined categories for filtering
+  const categories = [
+    "All Sports", "Cricket", "Hockey", "Kabaddi", "Basketball", "Badminton"
+  ];
 
   return (
     <div className="container my-5">
+      {/* Filter Bar */}
+      <div className="d-flex justify-content-center align-items-center mb-4" style={{ padding: "12px 30px", borderRadius: "25px" }}>
+        <label htmlFor="category-select" className="form-label me-3" style={{ fontSize: "1.1rem", marginBottom: 0 }}>
+          Filter by Sports:
+        </label>
+        <select
+          id="category-select"
+          className="form-select form-select-lg w-auto"
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          style={{
+            fontSize: "1.1rem",
+            padding: "0.6rem",
+            borderRadius: "20px",
+            borderColor: "#4CAF50", // Green border color
+            boxShadow: "none", // Remove shadow to keep it clean
+          }}
+        >
+          <option value="">All Sports</option>
+          {categories.slice(1).map((category, index) => (
+            <option key={index} value={category.toLowerCase()}>
+              {category}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Display the number of results found */}
+      <p className="text-muted">
+        {filteredNews.length} {filteredNews.length === 1 ? "result" : "results"} found.
+      </p>
+
       {isLoading ? (
         <p>Loading news...</p>
       ) : error ? (
         <p className="text-danger">{error}</p>
-      ) : newsData.length > 0 ? (
-        Object.entries(groupedNews).map(([sport, newsItems]) => (
-          <div key={sport}>
-            <h2 className="text-primary mb-3">
-              {sport.charAt(0).toUpperCase() + sport.slice(1)}
-            </h2>
-            <div className="row mb-4">
-              {newsItems.map((news) => (
-                <div className="col-md-6 mb-4" key={news._id}>
-                  <div className="card shadow-sm border-0">
+      ) : filteredNews.length > 0 ? (
+        <div className="row">
+          {filteredNews.map((news) => (
+            <div className="col-md-4 mb-4" key={news._id}>
+              <div className="card h-100 shadow-sm">
+                <div className="row g-0">
+                  {/* Image on one side */}
+                  <div className="col-5">
                     <img
-                      src={news.news_image || "./rgukt_logo.png"} // Fallback image
+                      src={news.news_image || "./rgukt_logo.png"}
                       alt={news.title}
-                      className="card-img-top"
-                      style={{ height: "200px", objectFit: "cover" }}
-                      onError={(e) =>
-                        (e.target.src = "https://via.placeholder.com/150")
-                      }
+                      className="img-fluid rounded-start"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderTopLeftRadius: "5px",
+                        borderBottomLeftRadius: "5px",
+                      }}
+                      onError={(e) => {
+                        console.log("Error loading image:", e.target.src);
+                        e.target.src = "https://via.placeholder.com/150";
+                      }}
                     />
-                    <div className="card-body">
+                  </div>
+
+                  {/* Title and description on the other side */}
+                  <div className="col-7">
+                    <div className="card-body d-flex flex-column">
                       <h5 className="card-title">{news.title}</h5>
-                      <p className="card-text text-secondary">
+                      <p
+                        className="card-text text-muted"
+                        style={{
+                          maxHeight: "3rem",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
                         {news.news_content}
                       </p>
-                      {news.category && (
-                        <span className="badge bg-secondary">
-                          {news.category}
-                        </span>
-                      )}
                     </div>
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
-        ))
+          ))}
+        </div>
       ) : (
         <p>No news available.</p>
       )}

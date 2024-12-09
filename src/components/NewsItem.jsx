@@ -26,40 +26,70 @@ function NewsItem({ news, onDelete, onUpdate }) {
   };
 
   return (
-    <div className="card mb-3" style={{ maxWidth: "540px" }}>
+    <div className="card mb-3 shadow-sm">
       <div className="row g-0">
+        {/* Image on one side */}
         <div className="col-md-4">
-          <img src={imageSrc} className="img-fluid rounded-start" alt="News" />
+          <img
+            src={imageSrc || 'https://via.placeholder.com/150'}
+            className="img-fluid rounded-start"
+            alt="News"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              borderTopLeftRadius: '5px',
+              borderBottomLeftRadius: '5px',
+            }}
+          />
         </div>
+
+        {/* Title, Description, and Actions */}
         <div className="col-md-8">
-          <div className="card-body">
-            <h5 className="card-title">{title}</h5>
-            <p className="card-text">{description}</p>
-            <button onClick={openModal} className="btn btn-primary me-2">Edit News</button>
-            <button onClick={handleDelete} className="btn btn-danger">Delete News</button>
+          <div className="card-body d-flex flex-column justify-content-between">
+            <div>
+              <h5 className="card-title">{title}</h5>
+              <p className="card-text text-muted" style={{ maxHeight: '4rem', overflow: 'hidden' }}>
+                {description}
+              </p>
+            </div>
+            <div className="d-flex">
+              <button onClick={openModal} className="btn btn-primary me-2">
+                Edit News
+              </button>
+              <button onClick={handleDelete} className="btn btn-danger">
+                Delete News
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Edit News Modal */}
       {isModalOpen && (
-        <div className="modal" style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-        }}>
-          <div className="modal-content" style={{
-            backgroundColor: "white",
-            padding: "20px",
-            borderRadius: "5px",
-            width: "500px"
-          }}>
+        <div
+          className="modal"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <div
+            className="modal-content"
+            style={{
+              backgroundColor: 'white',
+              padding: '20px',
+              borderRadius: '5px',
+              width: '500px',
+            }}
+          >
             <h5>Edit News</h5>
             <div className="form-group mb-3">
               <label>Title</label>
@@ -88,8 +118,12 @@ function NewsItem({ news, onDelete, onUpdate }) {
                 onChange={(e) => setDescription(e.target.value)}
               ></textarea>
             </div>
-            <button onClick={handleSave} className="btn btn-success me-2">Save</button>
-            <button onClick={closeModal} className="btn btn-secondary">Cancel</button>
+            <button onClick={handleSave} className="btn btn-success me-2">
+              Save
+            </button>
+            <button onClick={closeModal} className="btn btn-secondary">
+              Cancel
+            </button>
           </div>
         </div>
       )}

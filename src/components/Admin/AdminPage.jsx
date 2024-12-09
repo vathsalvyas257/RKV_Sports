@@ -20,6 +20,23 @@ export default function AdminPage() {
     }, 3000); // Hide the alert after 3 seconds
   };
 
+  // Function to fetch news after creating
+  const fetchNews = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/News/");
+      const data = await response.json();
+      if (response.ok) {
+        // Trigger the fetch news call in AdminNews
+        setAlert("News fetched successfully.", "success");
+      } else {
+        setAlert("No news found.", "warning");
+      }
+    } catch (error) {
+      console.error("Error fetching news:", error);
+      setAlert("Error fetching news. Please try again later.", "danger");
+    }
+  };
+
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -78,7 +95,7 @@ export default function AdminPage() {
       )}
 
       {/* AdminNews Component */}
-      <AdminNews setAlert={setAlert} />
+      <AdminNews setAlert={setAlert} fetchNews={fetchNews} />
 
       {showTournamentModal && (
         <CreateTournamentModal onClose={() => setShowTournamentModal(false)} />
@@ -87,6 +104,7 @@ export default function AdminPage() {
         <CreateNewsModal
           onClose={() => setShowNewsModal(false)}
           setAlert={setAlert}
+          fetchNews={fetchNews} // Pass the fetchNews method
         />
       )}
     </div>
