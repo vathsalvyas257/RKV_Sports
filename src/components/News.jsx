@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 
 export default function News() {
   const [newsData, setNewsData] = useState([]);
+  const [filteredNews, setFilteredNews] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(""); // Store selected category
 
   useEffect(() => {
     // Fetch news data from the backend API
@@ -17,7 +18,8 @@ export default function News() {
       })
       .then((data) => {
         console.log("Fetched Data:", data); // Check the fetched data structure
-        setNewsData(data.reverse()); // Reverse the fetched news data
+        setNewsData(data.reverse());
+        setFilteredNews(data.reverse()); // Initialize filtered news
         setIsLoading(false);
       })
       .catch((error) => {
@@ -27,47 +29,50 @@ export default function News() {
       });
   }, []);
 
-  // Filter news based on the selected category (sport type)
-  const filteredNews = selectedCategory
-    ? newsData.filter((news) => news.sport_type.toLowerCase() === selectedCategory.toLowerCase())
-    : newsData;
+  const handleFilterChange = (category) => {
+    setSelectedCategory(category);
+    if (category === "all") {
+      setFilteredNews(newsData);
+    } else {
+      setFilteredNews(
+        newsData.filter(
+          (news) =>
+            news.sport_type &&
+            news.sport_type.toLowerCase() === category.toLowerCase()
+        )
+      );
+    }
+  };
 
-  // Predefined categories for filtering
-  const categories = [
-    "All Sports", "Cricket", "Hockey", "Kabaddi", "Basketball", "Badminton"
-  ];
+  const categories = ["all", "cricket", "hockey", "kabaddi", "basketball", "badminton"];
 
   return (
     <div className="container my-5">
-      {/* Filter Bar */}
-      <div className="d-flex justify-content-center align-items-center mb-4" style={{ padding: "12px 30px", borderRadius: "25px" }}>
-        <label htmlFor="category-select" className="form-label me-3" style={{ fontSize: "1.1rem", marginBottom: 0 }}>
-          Filter by Sports:
-        </label>
-        <select
-          id="category-select"
-          className="form-select form-select-lg w-auto"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          style={{
-            fontSize: "1.1rem",
-            padding: "0.6rem",
-            borderRadius: "20px",
-            borderColor: "#4CAF50", // Green border color
-            boxShadow: "none", // Remove shadow to keep it clean
-          }}
-        >
-          <option value="">All Sports</option>
-          {categories.slice(1).map((category, index) => (
-            <option key={index} value={category.toLowerCase()}>
-              {category}
-            </option>
-          ))}
-        </select>
+      <h2 className="text-primary text-center mb-4">Latest News</h2>
+
+      {/* Center Filter Options */}
+      <div
+        className="d-flex justify-content-center align-items-center mb-4"
+        style={{
+          height: "10vh", // Adjust height to position in the middle
+          gap: "10px",
+        }}
+      >
+        {categories.map((category) => (
+          <button
+            key={category}
+            className={`btn btn-sm ${
+              selectedCategory === category ? "btn-primary" : "btn-outline-primary"
+            }`}
+            onClick={() => handleFilterChange(category)}
+          >
+            {category.charAt(0).toUpperCase() + category.slice(1)}
+          </button>
+        ))}
       </div>
 
       {/* Display the number of results found */}
-      <p className="text-muted">
+      <p className="text-muted text-center">
         {filteredNews.length} {filteredNews.length === 1 ? "result" : "results"} found.
       </p>
 
@@ -123,7 +128,7 @@ export default function News() {
           ))}
         </div>
       ) : (
-        <p>No news available.</p>
+        <p className="text-center">No news available.</p>
       )}
     </div>
   );

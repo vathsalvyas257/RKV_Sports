@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import './CreateNewsModal.css';
+import { toast } from 'react-toastify'; // Import toast for notifications
 
 export default function CreateNewsModal({ onClose, setAlert, addNewNews }) {
   const [formData, setFormData] = useState({
@@ -14,7 +15,7 @@ export default function CreateNewsModal({ onClose, setAlert, addNewNews }) {
 
   const handleSubmit = async () => {
     if (!formData.newsTitle || !formData.sportType || !formData.description || !formData.image) {
-      setAlert("All fields are required.", "error");
+      toast.error("All fields are required.");
       return;
     }
 
@@ -38,34 +39,32 @@ export default function CreateNewsModal({ onClose, setAlert, addNewNews }) {
       const data = await response.json();
 
       if (response.ok) {
-        setAlert("News Created Successfully!", "success");
-
-        // Call the parent function to add the newly created news to the list
-        addNewNews(data); // Assuming 'data' contains the created news object
-
+        toast.success("News Created Successfully!");
+        addNewNews(data); // Call the parent function to add the newly created news
         onClose();
       } else {
-        setAlert(data.detail || 'Failed to create news.', "error");
+        toast.error("Failed to create news.");
       }
     } catch (error) {
-      setAlert('An error occurred while creating news.', "error");
+      console.error("Error creating news:", error);
+      toast.error("Error creating news.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Modal show={true} onHide={onClose} animation={true} centered>
+    <Modal show onHide={onClose}>
       <Modal.Header closeButton>
         <Modal.Title>Create News</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
-          <Form.Group controlId="formNewsTitle">
+          <Form.Group controlId="newsTitle">
             <Form.Label>News Title</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Enter news title"
+              placeholder="Enter title"
               value={formData.newsTitle}
               onChange={(e) =>
                 setFormData({ ...formData, newsTitle: e.target.value })
@@ -73,7 +72,7 @@ export default function CreateNewsModal({ onClose, setAlert, addNewNews }) {
             />
           </Form.Group>
 
-          <Form.Group controlId="formSportType">
+          <Form.Group controlId="sportType" className="mt-3">
             <Form.Label>Sport Type</Form.Label>
             <Form.Control
               as="select"
@@ -90,7 +89,7 @@ export default function CreateNewsModal({ onClose, setAlert, addNewNews }) {
             </Form.Control>
           </Form.Group>
 
-          <Form.Group controlId="formDescription">
+          <Form.Group controlId="description" className="mt-3">
             <Form.Label>Description</Form.Label>
             <Form.Control
               as="textarea"
@@ -103,7 +102,7 @@ export default function CreateNewsModal({ onClose, setAlert, addNewNews }) {
             />
           </Form.Group>
 
-          <Form.Group controlId="formFile">
+          <Form.Group controlId="image" className="mt-3">
             <Form.Label>Upload Image</Form.Label>
             <Form.Control
               type="file"
@@ -114,12 +113,17 @@ export default function CreateNewsModal({ onClose, setAlert, addNewNews }) {
           </Form.Group>
         </Form>
       </Modal.Body>
+
       <Modal.Footer>
         <Button variant="secondary" onClick={onClose}>
           Close
         </Button>
-        <Button variant="primary" onClick={handleSubmit} disabled={isLoading}>
-          {isLoading ? "Creating..." : "Create News"}
+        <Button
+          variant="primary"
+          onClick={handleSubmit}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Saving...' : 'Save News'}
         </Button>
       </Modal.Footer>
     </Modal>
