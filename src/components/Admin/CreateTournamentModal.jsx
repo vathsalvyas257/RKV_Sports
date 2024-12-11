@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify"; 
-import 'react-toastify/dist/ReactToastify.css'; 
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function CreateTournamentModal({ onClose }) {
   const [formData, setFormData] = useState({
     tournament_name: "",
-    sport_type: "cricket", // Default value set
+    sport_type: "cricket", // Default value
     location: "",
     start_date: "",
     end_date: "",
@@ -61,20 +61,20 @@ export default function CreateTournamentModal({ onClose }) {
 
       if (response.status === 200) {
         toast.success("Tournament created successfully!", {
-          position: "bottom-right", 
+          position: "bottom-right",
           autoClose: 5000,
         });
         setTimeout(() => {
-          onClose(); // Close the modal after the toast has shown
-        }, 5000); // Adjust the delay if necessary
+          onClose();
+        }, 5000);
       }
     } catch (error) {
       const errorMsg = error?.response?.data?.detail?.[0]?.msg || "Something went wrong.";
       toast.error(errorMsg, {
-        position: "bottom-right", 
+        position: "bottom-right",
         autoClose: 5000,
       });
-      setErrorMessage(errorMsg); 
+      setErrorMessage(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -102,7 +102,6 @@ export default function CreateTournamentModal({ onClose }) {
                   name="tournament_name"
                   value={formData.tournament_name}
                   onChange={handleInputChange}
-                  placeholder="e.g., CSPL 2024"
                   className="form-control"
                   required
                 />
@@ -130,34 +129,130 @@ export default function CreateTournamentModal({ onClose }) {
                   name="location"
                   value={formData.location}
                   onChange={handleInputChange}
-                  placeholder="e.g., Idupulapaya, Kadapa"
                   className="form-control"
                   required
+                />
+              </div>
+              <div className="row">
+                <div className="col-md-6 mb-3">
+                  <label className="form-label">Start Date</label>
+                  <input
+                    type="date"
+                    name="start_date"
+                    value={formData.start_date}
+                    onChange={handleInputChange}
+                    className="form-control"
+                    required
+                  />
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label">End Date</label>
+                  <input
+                    type="date"
+                    name="end_date"
+                    value={formData.end_date}
+                    onChange={handleInputChange}
+                    className="form-control"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-6 mb-3">
+                  <label className="form-label">Max Teams</label>
+                  <input
+                    type="number"
+                    name="max_teams"
+                    value={formData.max_teams}
+                    onChange={handleInputChange}
+                    className="form-control"
+                    required
+                  />
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label">Team Size</label>
+                  <input
+                    type="number"
+                    name="team_size"
+                    value={formData.team_size}
+                    onChange={handleInputChange}
+                    className="form-control"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-4 mb-3">
+                  <label className="form-label">First Place Prize</label>
+                  <input
+                    type="text"
+                    name="prize_first_place"
+                    value={formData.prize_first_place}
+                    onChange={handleInputChange}
+                    className="form-control"
+                  />
+                </div>
+                <div className="col-md-4 mb-3">
+                  <label className="form-label">Second Place Prize</label>
+                  <input
+                    type="text"
+                    name="prize_second_place"
+                    value={formData.prize_second_place}
+                    onChange={handleInputChange}
+                    className="form-control"
+                  />
+                </div>
+                <div className="col-md-4 mb-3">
+                  <label className="form-label">Third Place Prize</label>
+                  <input
+                    type="text"
+                    name="prize_third_place"
+                    value={formData.prize_third_place}
+                    onChange={handleInputChange}
+                    className="form-control"
+                  />
+                </div>
+              </div>
+              <div className="mb-3">
+                <label className="form-label">Rules</label>
+                <textarea
+                  name="rules"
+                  value={formData.rules}
+                  onChange={handleInputChange}
+                  className="form-control"
+                  rows="3"
+                ></textarea>
+              </div>
+              <div className="mb-3">
+                <label className="form-label">Match Format</label>
+                <input
+                  type="text"
+                  name="match_format"
+                  value={formData.match_format}
+                  onChange={handleInputChange}
+                  className="form-control"
                 />
               </div>
               <div className="mb-3">
-                <label className="form-label">Start Date</label>
+                <label className="form-label">Entry Fee</label>
                 <input
-                  type="date"
-                  name="start_date"
-                  value={formData.start_date}
+                  type="number"
+                  name="entry_fee"
+                  value={formData.entry_fee}
                   onChange={handleInputChange}
                   className="form-control"
-                  required
                 />
               </div>
               <div className="mb-3">
-                <label className="form-label">End Date</label>
-                <input
-                  type="date"
-                  name="end_date"
-                  value={formData.end_date}
+                <label className="form-label">Sport Specific Details</label>
+                <textarea
+                  name="sport_specific_details"
+                  value={formData.sport_specific_details}
                   onChange={handleInputChange}
                   className="form-control"
-                  required
-                />
+                  rows="3"
+                ></textarea>
               </div>
-              {/* Repeat other fields similarly */}
               <div className="mb-3">
                 <label className="form-label">Tournament Image</label>
                 <input

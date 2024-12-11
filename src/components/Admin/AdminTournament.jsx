@@ -84,7 +84,7 @@ export default function AdminTournament() {
 
   useEffect(() => {
     fetchTournaments();
-  }, []);
+  }, [handleCloseModal]);
 
   return (
     <div className="mt-5">
