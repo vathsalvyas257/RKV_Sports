@@ -19,6 +19,8 @@ import AuthState from "./components/context/AuthState";
 import AdminPage from "./components/Admin/AdminPage";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ToastContainer } from 'react-toastify';
+import ErrorBoundary from './components/ErrorBoundary.jsx';  // Updated import with .jsx extension
+
 
 function App() {
   return (
@@ -28,29 +30,31 @@ function App() {
           <div className="d-flex flex-column min-vh-100"> {/* Flexbox layout */}
             <Navbar />
             <main className="flex-fill"> {/* Main content area */}
-              <Routes>
-                <Route exact path="/" element={<Home />} />
+              <ErrorBoundary>
+                <Routes>
+                  <Route exact path="/" element={<Home />} />
 
-                {/* Registration pages */}
-                <Route exact path="/hockey" element={<HockeyRegister />} />
-                <Route exact path="/cricket" element={<CricRegister />} />
-                <Route exact path="/kabaddi" element={<KabbaddiRegistration />} />
-                <Route exact path="/badminton" element={<BadmintonRegister />} />
-                <Route exact path="/basketball" element={<BasketballRegister />} />
+                  {/* Registration pages */}
+                  <Route exact path="/hockey" element={<HockeyRegister />} />
+                  <Route exact path="/cricket" element={<CricRegister />} />
+                  <Route exact path="/kabaddi" element={<KabbaddiRegistration />} />
+                  <Route exact path="/badminton" element={<BadmintonRegister />} />
+                  <Route exact path="/basketball" element={<BasketballRegister />} />
 
-                <Route exact path="/tournaments" element={<Tournaments />} />
-                <Route exact path="/livescores" element={<Livescore />} />
-                <Route exact path="/news" element={<News />} />
-                <Route exact path="/dept" element={<AdminPage />} />
-                <Route exact path="/login" element={<Login />} />
-                <Route exact path="/profile" element={<User />} />
-                <Route exact path="/signup" element={<Signup />} />
-              </Routes>
+                  <Route exact path="/tournaments" element={<Tournaments />} />
+                  <Route exact path="/livescores" element={<Livescore />} />
+                  <Route exact path="/news" element={<News />} />
+                  <Route exact path="/dept" element={<AdminPage />} />
+                  <Route exact path="/login" element={<Login />} />
+                  <Route exact path="/profile" element={<User />} />
+                  <Route exact path="/signup" element={<Signup />} />
+                </Routes>
+              </ErrorBoundary>
             </main>
             <Footer />
           </div>
           {/* Place the ToastContainer here and set position to bottom-right */}
-          <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} />
+          <ToastContainer position="bottom-right" autoClose={5000} hideProgressBar={false} />
         </AuthState>
       </Router>
     </SportsState>

@@ -38,7 +38,7 @@ export default function AdminNews({ newsList, setNewsList }) {
     };
 
     fetchNews(); // Fetch news when the component mounts
-  }, [setNewsList]);
+  });
 
   // Create News
   const createNews = async () => {
@@ -46,7 +46,7 @@ export default function AdminNews({ newsList, setNewsList }) {
       toast.error("Title and content are required!");
       return;
     }
-
+  
     try {
       const response = await fetch("http://127.0.0.1:8000/News/", {
         method: "POST",
@@ -55,16 +55,16 @@ export default function AdminNews({ newsList, setNewsList }) {
         },
         body: JSON.stringify(newNews),
       });
-
+  
       if (response.ok) {
         const createdNewsItem = await response.json();
-
+  
         // Show success toast
         toast.success("News created successfully!");
-
-        // First add the newly created news item to the array (without immediate UI update)
-        setNewsList((prevNews) => [...prevNews, createdNewsItem]);
-
+  
+        // Add the newly created news item to the front of the array (latest first)
+        setNewsList((prevNews) => [createdNewsItem, ...prevNews]);
+  
         // Close modal and reset form
         setCreateModalVisible(false);
         setNewNews({
@@ -72,11 +72,6 @@ export default function AdminNews({ newsList, setNewsList }) {
           news_content: "",
           news_image_url: "",
         });
-
-        // After a short delay, trigger the re-render with the news in reverse order
-        setTimeout(() => {
-          setNewsList((prevNews) => [...prevNews].reverse());  // Reverse the array after the delay
-        }, 2000); // 2 seconds delay before reversing and triggering re-render
       } else {
         toast.error("Error creating news.");
       }

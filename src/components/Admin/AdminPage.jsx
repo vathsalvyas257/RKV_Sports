@@ -111,10 +111,6 @@ export default function AdminPage() {
         <CreateNewsModal
           onClose={() => setShowNewsModal(false)}
           addNewNews={(newsItem) => {
-            toast.success("News created successfully!", {
-              position: "bottom-right",
-              autoClose: 5000,
-            });
             addNewNews(newsItem);
           }}
         />
