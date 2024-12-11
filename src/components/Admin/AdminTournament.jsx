@@ -39,6 +39,49 @@ export default function AdminTournament() {
     }
   };
 
+  const deleteTournament = async (tournamentName) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/TournamentsCreation/?tournament_name=${tournamentName}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        toast.success("Tournament deleted successfully!");
+        fetchTournaments(); // Refresh tournaments list after deletion
+      } else {
+        const data = await response.json();
+        displayError(data.detail ? data.detail[0].msg : "Failed to delete tournament.");
+      }
+    } catch (error) {
+      console.error("Error deleting tournament:", error);
+      displayError("Error deleting tournament. Please try again later.");
+    }
+  };
+
+  const updateTournament = async (updatedTournament) => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/TournamentsCreation/", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedTournament),
+      });
+
+      if (response.ok) {
+        toast.success("Tournament updated successfully!");
+        fetchTournaments(); // Refresh tournaments list after update
+        handleCloseEditModal();
+      } else {
+        const data = await response.json();
+        displayError(data.detail ? data.detail[0].msg : "Failed to update tournament.");
+      }
+    } catch (error) {
+      console.error("Error updating tournament:", error);
+      displayError("Error updating tournament. Please try again later.");
+    }
+  };
+
   useEffect(() => {
     fetchTournaments();
   }, []);
@@ -50,8 +93,6 @@ export default function AdminTournament() {
           onClose={handleCloseModal}
           onSuccess={(newTournament) => {
             toast.success("Tournament created successfully!");
-
-            // Dynamically add the new tournament to the state
             setTournaments((prevTournaments) => [newTournament, ...prevTournaments]);
           }}
           onError={displayError}
@@ -62,13 +103,7 @@ export default function AdminTournament() {
         <EditTournamentModal
           tournament={selectedTournament}
           onClose={handleCloseEditModal}
-          onSuccess={() => {
-            toast.success("Tournament updated successfully!", {
-              position: "bottom-right",
-              autoClose: 5000,
-            });
-            fetchTournaments();
-          }}
+          onSuccess={updateTournament}
           onError={displayError}
         />
       )}
@@ -80,10 +115,10 @@ export default function AdminTournament() {
             scrollBehavior: "smooth",
             whiteSpace: "nowrap",
             paddingBottom: "10px",
-            maxWidth: "100%", // Ensure the container takes full available width
-            overflowX: "auto", // Allow horizontal scroll
-            scrollbarWidth: "none", // Firefox
-            msOverflowStyle: "none", // Internet Explorer 10+
+            maxWidth: "100%",
+            overflowX: "auto",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
           }}
         >
           <div
@@ -93,7 +128,7 @@ export default function AdminTournament() {
               flexWrap: "nowrap",
               gap: "15px",
               padding: "15px",
-              minWidth: "960px", // Set this to fit 3 cards of width 320px each
+              minWidth: "960px",
             }}
           >
             {tournaments.map((tournament, index) => (
@@ -103,8 +138,8 @@ export default function AdminTournament() {
                 style={{
                   borderRadius: "10px",
                   overflow: "hidden",
-                  width: "320px", // Increase width of cards
-                  flexShrink: "0", // Prevent cards from shrinking
+                  width: "320px",
+                  flexShrink: "0",
                 }}
               >
                 {/* Image Section */}
@@ -113,7 +148,7 @@ export default function AdminTournament() {
                     backgroundImage: `url(${tournament.tournament_image || "./rgukt_logo.png"})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
-                    height: "200px", // Increase height for a more prominent image
+                    height: "200px",
                   }}
                 ></div>
 
@@ -126,9 +161,7 @@ export default function AdminTournament() {
                   }}
                 >
                   <h5 className="card-title">{tournament.tournament_name}</h5>
-                  <p className="card-text">
-                    Sport: {tournament.sport_type}
-                  </p>
+                  <p className="card-text">Sport: {tournament.sport_type}</p>
                   <p className="card-text">
                     <FaMapMarkerAlt className="text-danger" /> {tournament.location}
                   </p>
@@ -142,12 +175,20 @@ export default function AdminTournament() {
                       .filter(Boolean)
                       .join(", ")}
                   </p>
-                  <button
-                    className="btn btn-primary text-white"
-                    onClick={() => handleOpenEditModal(tournament)}
-                  >
-                    Edit
-                  </button>
+                  <div>
+                    <button
+                      className="btn btn-primary text-white"
+                      onClick={() => handleOpenEditModal(tournament)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn btn-danger text-white ms-2"
+                      onClick={() => deleteTournament(tournament.tournament_name)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
