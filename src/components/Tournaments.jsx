@@ -19,8 +19,10 @@ export default function Tournaments() {
     try {
       const response = await fetch("http://127.0.0.1:8000/TournamentsCreation/");
       const data = await response.json();
+      // console.log(data);
       if (response.ok) {
         // Sort tournaments by date (assuming 'start_date' is the field you want to use)
+        
         const sortedTournaments = data.sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
         setTournaments(sortedTournaments);
         setFilteredTournaments(sortedTournaments);
@@ -84,6 +86,10 @@ export default function Tournaments() {
           )
         )}
       </div>
+        {/* Display the number of results found */}
+        <p className="text-muted text-center">
+        {filteredTournaments.length} {filteredTournaments.length === 1 ? "result" : "results"} found.
+      </p>
 
       {/* Display Tournaments */}
       {filteredTournaments.length > 0 ? (

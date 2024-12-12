@@ -13,9 +13,10 @@ export default function TournamentCard({ tournament, onEdit }) {
       }}
     >
       {/* Image Section */}
+      {console.log(tournament.tournament_image_url)}
       <div
         style={{
-          backgroundImage: `url(${tournament.tournament_image || "./rgukt_logo.png"})`,
+          backgroundImage: `url(${tournament.tournament_image_url|| "./rgukt_logo.png"})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           height: "200px", // Adjust image height

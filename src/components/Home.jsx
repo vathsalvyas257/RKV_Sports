@@ -5,7 +5,7 @@ import SportsContext from "./context/SportsContext";
 
 export default function Home() {
   const {carouselImages,addCarouselImage}=useContext(SportsContext);
-  console.log(carouselImages);
+  // console.log(carouselImages);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imageId, setImageId] = useState("");
   const [uploadedImage, setUploadedImage] = useState(null);

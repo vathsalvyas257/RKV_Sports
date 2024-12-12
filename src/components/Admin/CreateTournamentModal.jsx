@@ -60,10 +60,7 @@ export default function CreateTournamentModal({ onClose }) {
       );
 
       if (response.status === 200) {
-        toast.success("Tournament created successfully!", {
-          position: "bottom-right",
-          autoClose: 5000,
-        });
+        toast.success("Tournament created successfully!");
         setTimeout(() => {
           onClose();
         }, 5000);
