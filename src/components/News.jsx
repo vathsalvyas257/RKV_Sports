@@ -49,7 +49,7 @@ export default function News() {
                 <div className="col-md-6 mb-4" key={news._id}>
                   <div className="card shadow-sm border-0">
                     <img
-                      src={news.news_image || "./rgukt_logo.png"} // Fallback image
+                      src={news.news_image_url || "./rgukt_logo.png"} // Fallback image
                       alt={news.title}
                       className="card-img-top"
                       style={{ height: "200px", objectFit: "cover" }}
