@@ -9,11 +9,12 @@ import Dept from "./components/Dept";
 import Login from "./components/Login";
 import User from "./components/user/User";
 import Signup from "./components/Signup";
-import KabbaddiRegistration from "./components/KabbaddiRegistration";
-import CricRegister from "./components/CricRegister";
-import BasketballRegister from "./components/BasketballRegister";
-import BadmintonRegister from "./components/BadmintonRegister";
-import HockeyRegister from "./components/HockeyRegister";
+import KabaddiRegistration from "./components/RegistrationForms/KabaddiRegistration";
+import CricketRegistration from "./components/RegistrationForms/CricketRegistration";
+import BadmintonRegistration from "./components/RegistrationForms/BadmintonRegistration";
+import BasketballRegistration from "./components/RegistrationForms/BasketballRegistration";
+import HockeyRegistration from "./components/RegistrationForms/HockeyRegistration"
+import RegistrationSuccess from "./components/RegistrationForms/RegistrationSuccess.jsx";
 import SportsState from "./components/context/SportsState";
 import AuthState from "./components/context/AuthState";
 import AdminPage from "./components/Admin/AdminPage";
@@ -35,11 +36,15 @@ function App() {
                   <Route exact path="/" element={<Home />} />
 
                   {/* Registration pages */}
-                  <Route exact path="/hockey" element={<HockeyRegister />} />
-                  <Route exact path="/cricket" element={<CricRegister />} />
-                  <Route exact path="/kabaddi" element={<KabbaddiRegistration />} />
-                  <Route exact path="/badminton" element={<BadmintonRegister />} />
-                  <Route exact path="/basketball" element={<BasketballRegister />} />
+                  <Route exact path="/registration" element={<Tournaments/>} />
+                  <Route exact path="/registration/cricket" element={<CricketRegistration/>} />
+                  <Route exact path="/registration/hockey" element={<HockeyRegistration />} />
+                  <Route exact path="/registration/kabaddi" element={<KabaddiRegistration />} />
+                  <Route exact path="/registration/badminton" element={<BadmintonRegistration />} />
+                  <Route exact path="/registration/basketball" element={<BasketballRegistration />} />
+                  <Route exact path="/registration-success" element={< RegistrationSuccess/>} />
+
+
 
                   <Route exact path="/tournaments" element={<Tournaments />} />
                   <Route exact path="/livescores" element={<Livescore />} />
