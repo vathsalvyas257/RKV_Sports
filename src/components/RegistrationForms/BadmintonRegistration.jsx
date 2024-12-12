@@ -16,6 +16,7 @@ const BadmintonRegistration = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false); // New state for submit status
   const navigate = useNavigate();
 
   // Validation function
@@ -66,6 +67,8 @@ const BadmintonRegistration = () => {
 
     if (Object.keys(validationErrors).length > 0) return;
 
+    setIsSubmitting(true); // Set submitting state to true
+
     const formData = new FormData();
     formData.append('team_name', formValues.teamName);
     formData.append('coach_name', formValues.coachName);
@@ -105,6 +108,8 @@ const BadmintonRegistration = () => {
     } catch (error) {
       toast.error('Something went wrong, please try again later!');
       console.error('Error submitting form:', error);
+    } finally {
+      setIsSubmitting(false); // Set submitting state back to false
     }
   };
 
@@ -214,8 +219,8 @@ const BadmintonRegistration = () => {
           />
         </div>
 
-        <button type="submit" className="btn btn-primary btn-block mt-4">
-          Submit Registration
+        <button type="submit" className="btn btn-primary btn-block mt-4" disabled={isSubmitting}>
+          {isSubmitting ? 'Submitting...' : 'Submit Registration'}
         </button>
       </form>
 

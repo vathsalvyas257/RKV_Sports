@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Modal, Button } from "react-bootstrap";
 
 export default function News() {
   const [newsData, setNewsData] = useState([]);
@@ -6,6 +7,13 @@ export default function News() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [viewModalVisible, setViewModalVisible] = useState(false);
+  const [selectedNews, setSelectedNews] = useState(null);
+
+  const handleCardClick = (news) => {
+    setSelectedNews(news); // Set the selected news for the modal
+    setViewModalVisible(true); // Show the modal
+  };
 
   useEffect(() => {
     // Fetch news data from the backend API
@@ -87,10 +95,9 @@ export default function News() {
               <div className="card h-100 shadow-sm">
                 <div className="row g-0">
                   {/* Image on one side */}
-                  {console.log(news.news_image_url)}
-                  <div className="col-5">
+                  <div className="col-5" onClick={() => handleCardClick(news)}>
                     <img
-                      src={news.news_image_url|| "./rgukt_logo.png"}
+                      src={news.news_image_url || "./rgukt_logo.png"}
                       alt={news.title}
                       className="img-fluid rounded-start"
                       style={{
@@ -101,7 +108,6 @@ export default function News() {
                         borderBottomLeftRadius: "5px",
                       }}
                       onError={(e) => {
-                        console.log("Error loading image:", e.target.src);
                         e.target.src = "https://via.placeholder.com/150";
                       }}
                     />
@@ -131,6 +137,34 @@ export default function News() {
       ) : (
         <p className="text-center">No news available.</p>
       )}
+
+      {/* Modal for news details */}
+      <Modal
+        show={viewModalVisible}
+        onHide={() => setViewModalVisible(false)}
+        size="lg"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>{selectedNews?.title}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <img
+            src={selectedNews?.news_image_url || "./rgukt_logo.png"}
+            alt={selectedNews?.title}
+            style={{ width: "100%", maxHeight: "400px", objectFit: "cover" }}
+            onError={(e) => (e.target.src = "https://via.placeholder.com/600x400")}
+          />
+          <p className="mt-3" style={{ fontSize: "18px" }}>
+            {selectedNews?.news_content}
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setViewModalVisible(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

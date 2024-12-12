@@ -145,7 +145,7 @@ export default function AdminTournament() {
                 {/* Image Section */}
                 <div
                   style={{
-                    backgroundImage: `url(${tournament.tournament_image || "./rgukt_logo.png"})`,
+                    backgroundImage: `url(${tournament.tournament_image_url || "./rgukt_logo.png"})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     height: "200px",
