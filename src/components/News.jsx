@@ -90,7 +90,7 @@ export default function News() {
                   {console.log(news.news_image_url)}
                   <div className="col-5">
                     <img
-                      src={news.news_image_url|| "./rgukt_logo.png"}
+                      src={news.news_image || "./rgukt_logo.png"} // Fallback image
                       alt={news.title}
                       className="img-fluid rounded-start"
                       style={{

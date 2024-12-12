@@ -1,7 +1,8 @@
 import React, { useContext, useState } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // Import carousel styles
-import SportsContext from "./context/SportsContext";
+import SportsContext, { SportsProvider } from "./context/SportsContext";
+
 
 export default function Home() {
   const {carouselImages,addCarouselImage}=useContext(SportsContext);
@@ -22,7 +23,7 @@ export default function Home() {
       addCarouselImage({imageId,uploadedImage})
       setCarouselImages([
         ...carouselImages,
-        { id: imageId, src: uploadedImage },
+        { banner_id: imageId, src: uploadedImage },
       ]);
       closeModal();
     }
@@ -66,7 +67,7 @@ export default function Home() {
             <div key={image.id} style={{ width: "100vw" }}>
               <img
                 src={image.banner_link}
-                alt={`Slide ${image.id}`}
+                alt={`Slide ${image.banner_id}`}
                 style={{
                   width: "100vw",
                   height: "500px",
