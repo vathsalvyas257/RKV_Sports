@@ -1,27 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CreateTournamentModal from "./CreateTournamentModal";
 import CreateNewsModal from "./CreateNewsModal";
-import Alert from "react-bootstrap/Alert";
 import AdminNews from "./AdminNews";
+import AdminTournament from "./AdminTournament"; // Import AdminTournament component
+import { toast } from "react-toastify";
 
 export default function AdminPage() {
   const [showTournamentModal, setShowTournamentModal] = useState(false);
   const [showNewsModal, setShowNewsModal] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertType, setAlertType] = useState("");
+  const [newsList, setNewsList] = useState([]);
+  const [tournaments, setTournaments] = useState([]);
+  const [isMounted, setIsMounted] = useState(true); // Track if the component is mounted
 
-  // Function to show alerts
-  const setAlert = (message, type) => {
-    setAlertMessage(message);
-    setAlertType(type);
-    setTimeout(() => {
-      setAlertMessage("");
-      setAlertType("");
-    }, 3000); // Hide the alert after 3 seconds
+  const addNewNews = (newsItem) => {
+    if (isMounted) {
+      setNewsList((prevNews) => [newsItem, ...prevNews]);
+    }
   };
 
+  const addNewTournament = (tournament) => {
+    if (isMounted) {
+      setTournaments((prevTournaments) => [tournament, ...prevTournaments]);
+    }
+  };
+
+  useEffect(() => {
+    // Set isMounted to true when the component mounts
+    setIsMounted(true);
+
+    // Set isMounted to false when the component unmounts
+    return () => {
+      setIsMounted(false);
+    };
+  }, []);
+
   return (
-    <div className="container mt-4">
+    <div className="container mt-4 admin-page">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="text-primary">Admin Dashboard</h2>
         <button className="btn btn-outline-primary">
@@ -29,7 +43,8 @@ export default function AdminPage() {
         </button>
       </div>
 
-      <div className="row g-4">
+      {/* Action Cards */}
+      <div className="row g-4 mb-4">
         <div className="col-md-6">
           <div
             className="card shadow-lg border-0 h-100"
@@ -62,31 +77,42 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* Display Alert Messages */}
-      {alertMessage && (
-        <Alert
-          variant={alertType}
-          style={{
-            position: "fixed",
-            bottom: 20,
-            right: 20,
-            zIndex: 9999,
-          }}
-        >
-          {alertMessage}
-        </Alert>
-      )}
+      {/* Latest News Section */}
+      <section className="mb-5">
+        <h3 className="text-primary">Latest News</h3>
+        <AdminNews
+          newsList={newsList}
+          setNewsList={setNewsList}
+        />
+      </section>
 
-      {/* AdminNews Component */}
-      <AdminNews setAlert={setAlert} />
+      {/* Latest Tournaments Section */}
+      <section>
+        <h3 className="text-primary">Latest Tournaments</h3>
+        <AdminTournament tournaments={tournaments} />
+      </section>
 
+      {/* Tournament Modal */}
       {showTournamentModal && (
-        <CreateTournamentModal onClose={() => setShowTournamentModal(false)} />
+        <CreateTournamentModal
+          onClose={() => setShowTournamentModal(false)}
+          onSuccess={(newTournament) => {
+            toast.success("Tournament created successfully!", {
+              position: "bottom-right",
+              autoClose: 5000,
+            });
+            addNewTournament(newTournament);
+          }}
+        />
       )}
+
+      {/* News Modal */}
       {showNewsModal && (
         <CreateNewsModal
           onClose={() => setShowNewsModal(false)}
-          setAlert={setAlert}
+          addNewNews={(newsItem) => {
+            addNewNews(newsItem);
+          }}
         />
       )}
     </div>

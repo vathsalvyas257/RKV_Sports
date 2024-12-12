@@ -1,287 +1,307 @@
 import React, { useState, useEffect } from "react";
-import Alert from "react-bootstrap/Alert";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import { toast } from "react-toastify"; // Import toast for notifications
+import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
 
-export default function AdminNews({ setAlert }) {
-  const [allNews, setAllNews] = useState([]); // To store all news
+export default function AdminNews({ newsList, setNewsList }) {
   const [loading, setLoading] = useState(true);
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [createModalVisible, setCreateModalVisible] = useState(false); // Modal to create news
+  const [createModalVisible, setCreateModalVisible] = useState(false);
   const [currentEditNews, setCurrentEditNews] = useState(null);
   const [newNews, setNewNews] = useState({
     title: "",
     news_content: "",
-    news_image: "",
-    category: "",
+    news_image_url: "",
   });
 
-  // Fetch the latest news from the API
-  const fetchNews = async () => {
-    try {
-      const response = await fetch("http://127.0.0.1:8000/News/");
-      const data = await response.json();
-      if (response.ok) {
-        setAllNews(data.slice(0, 5).reverse()); // Limit to latest 5 and reverse the order
-      } else {
-        setAlert("No news found.", "warning");
-      }
-    } catch (error) {
-      console.error("Error fetching news:", error);
-      setAlert("Error fetching news. Please try again later.", "danger");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Fetch all news and display latest first
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/News/"); // API endpoint to fetch news
+        const data = await response.json();
 
-  // Function to create news
+        if (response.ok) {
+          // Sort the news by the created_at field in descending order
+          const sortedNews = data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+          setNewsList(sortedNews); // Update the newsList with sorted news
+        } else {
+          toast.error("Failed to fetch news.");
+        }
+
+        setLoading(false); // Stop loading after data is fetched
+      } catch (error) {
+        toast.error("Error fetching news.");
+        setLoading(false);
+      }
+    };
+
+    fetchNews(); // Fetch news when the component mounts
+  });
+
+  // Create News
   const createNews = async () => {
+    if (!newNews.title || !newNews.news_content) {
+      toast.error("Title and content are required!");
+      return;
+    }
+  
     try {
       const response = await fetch("http://127.0.0.1:8000/News/", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(newNews),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create news.");
-      }
-
-      const data = await response.json();
-      setAllNews((prevNews) => [newNews, ...prevNews]);
-      setAlert("News created successfully.", "success");
-      setCreateModalVisible(false); // Close the modal after successful creation
-      setNewNews({ title: "", news_content: "", news_image: "", category: "" }); // Clear form data
-    } catch (error) {
-      console.error("Error creating news:", error);
-      setAlert(error.message, "danger"); // Use the error message from the backend
-    }
-  };
-
-  const deleteNews = async (title) => {
-    try {
-      const response = await fetch(`http://127.0.0.1:8000/News/?title=${title}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-      });
-      const data = await response.json();
+  
       if (response.ok) {
-        setAllNews((prevNews) => prevNews.filter((news) => news.title !== title));
-        setAlert(data.message, "success");
+        const createdNewsItem = await response.json();
+  
+        // Show success toast
+        toast.success("News created successfully!");
+  
+        // Add the newly created news item to the front of the array (latest first)
+        setNewsList((prevNews) => [createdNewsItem, ...prevNews]);
+  
+        // Close modal and reset form
+        setCreateModalVisible(false);
+        setNewNews({
+          title: "",
+          news_content: "",
+          news_image_url: "",
+        });
       } else {
-        setAlert("Failed to delete the news.", "danger");
+        toast.error("Error creating news.");
       }
     } catch (error) {
-      console.error("Error deleting news:", error);
-      setAlert("Error deleting news. Please try again later.", "danger");
+      toast.error("Error creating news.");
     }
   };
 
-  const updateNews = async (updatedNews) => {
-    const { title, news_content } = updatedNews;
+  // Edit News
+  const updateNews = async () => {
+    if (!currentEditNews.title || !currentEditNews.news_content) {
+      toast.error("Title and content are required!");
+      return;
+    }
+
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/News/?title=${title}&news_content=${news_content}`,
+        `http://127.0.0.1:8000/News/?title=${encodeURIComponent(currentEditNews.title)}&news_content=${encodeURIComponent(currentEditNews.news_content)}`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
       );
-      const data = await response.json();
+
       if (response.ok) {
-        setAllNews((prevNews) =>
-          prevNews.map((news) =>
-            news.title === title ? { ...news, news_content } : news
-          )
-        );
-        setAlert("News updated successfully.", "success");
+        // Update the news in the list
+        setNewsList((prevNews) => {
+          return prevNews.map((newsItem) =>
+            newsItem.title === currentEditNews.title ? currentEditNews : newsItem
+          );
+        });
+
+        // Show success toast
+        toast.success("News updated successfully!");
+
+        // Close the modal
+        setEditModalVisible(false);
+        setCurrentEditNews(null);
       } else {
-        setAlert("Failed to update the news.", "danger");
+        toast.error("Error updating news.");
       }
     } catch (error) {
-      console.error("Error updating news:", error);
-      setAlert("Error updating news. Please try again later.", "danger");
-    } finally {
-      setEditModalVisible(false);
+      toast.error("Error updating news.");
     }
   };
 
-  useEffect(() => {
-    fetchNews(); // Fetch news when the component loads
-  }, []);
+  // Delete News
+  const deleteNews = async (title) => {
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/News/?title=${encodeURIComponent(title)}`,
+        {
+          method: "DELETE", // Assuming your backend supports DELETE method for removing news
+        }
+      );
+
+      if (response.ok) {
+        toast.success("News deleted successfully!");
+        setNewsList((prevNews) => prevNews.filter((news) => news.title !== title)); // Remove the deleted news from the list
+      } else {
+        toast.error("Error deleting news.");
+      }
+    } catch (error) {
+      toast.error("Error deleting news.");
+    }
+  };
 
   return (
     <div className="mt-4">
-      <h3 className="text-primary mb-3">Latest News</h3>
-
-      {/* Horizontal News Section */}
       <div
         className="d-flex"
         style={{
-          overflowX: "auto", // Allows horizontal scrolling
-          maxWidth: "100%",
+          overflowX: "auto", // Horizontal scrolling
+          padding: "10px",
+          gap: "20px",
+          scrollSnapType: "x mandatory", // Ensures snap to individual cards
+          msOverflowStyle: "none", // Hide scrollbar in IE
+          scrollbarWidth: "none", // Hide scrollbar in Firefox
+          flexWrap: "nowrap", // Prevent wrapping of cards
+          marginBottom: "20px",
         }}
       >
         {loading ? (
           <div>Loading...</div>
-        ) : allNews.length > 0 ? (
-          allNews.map((news, index) => (
-            <div
-              key={index}
-              className="card shadow-sm border-0 mb-4"
-              style={{
-                width: "350px", // Increased width for each card
-                marginLeft: "20px",
-                display: "flex",
-                flexDirection: "row", // Flex to align items horizontally
-                height: "250px", // Increased height for consistency
-                alignItems: "center", // Vertically center the content
-              }}
-            >
-              {/* Image on the left */}
-              <img
-                src={news.news_image || "./rgukt_logo.png"} // Fallback image
-                className="card-img-left"
-                alt={news.title}
+        ) : newsList.length > 0 ? (
+          newsList
+            .slice() // Create a shallow copy of the array to avoid modifying the original list
+            .reverse() // Reverse the array to display latest items first
+            .map((news) => (
+              <div
+                key={news._id}
+                className="card shadow-sm border-0"
                 style={{
-                  width: "120px", // Increased image width
-                  height: "120px", // Increased image height
-                  objectFit: "cover", // Maintain aspect ratio of image
+                  minWidth: "300px",
+                  flexShrink: 0,
+                  scrollSnapAlign: "start", // Cards snap to the start
+                  display: "flex",
+                  flexDirection: "row",
+                  height: "250px",
+                  alignItems: "center",
                 }}
-                onError={(e) =>
-                  (e.target.src = "https://via.placeholder.com/150")
-                } // Fallback image on error
-              />
-
-              {/* Content on the right */}
-              <div className="card-body" style={{ paddingLeft: "15px" }}>
-                <h5 className="card-title" style={{ fontSize: "18px" }}>
-                  {news.title}
-                </h5>
-                <p
-                  className="card-text"
+              >
+                <img
+                  src={news.news_image || "./rgukt_logo.png"}
+                  className="card-img-left"
+                  alt={news.title}
                   style={{
-                    fontSize: "14px",
-                    color: "#555",
-                    height: "80px", // Increased height of the description
-                    overflow: "hidden", // Hide overflow content
+                    width: "120px",
+                    height: "120px",
+                    objectFit: "cover",
                   }}
-                >
-                  {news.news_content}
-                </p>
-                {/* Display Sports Category */}
-                {news.category && (
-                  <div
-                    className="badge bg-secondary"
-                    style={{ fontSize: "12px" }}
-                  >
-                    {news.category}
-                  </div>
-                )}
-                <div className="mt-3">
-                  {/* Edit and Delete Buttons */}
-                  <button
-                    className="btn btn-primary btn-sm me-2"
-                    onClick={() => {
-                      setCurrentEditNews(news);
-                      setEditModalVisible(true);
+                  onError={(e) => (e.target.src = "https://via.placeholder.com/150")}
+                />
+                <div className="card-body" style={{ paddingLeft: "15px" }}>
+                  <h5 className="card-title" style={{ fontSize: "18px" }}>
+                    {news.title}
+                  </h5>
+                  <p
+                    className="card-text"
+                    style={{
+                      fontSize: "14px",
+                      color: "#555",
+                      height: "80px",
+                      overflow: "hidden",
                     }}
                   >
-                    Edit
-                  </button>
-                  <button
-                    className="btn btn-danger btn-sm"
-                    onClick={() => deleteNews(news.title)}
-                  >
-                    Delete
-                  </button>
+                    {news.news_content}
+                  </p>
+                  <div className="mt-3">
+                    <button
+                      className="btn btn-primary btn-sm me-2"
+                      onClick={() => {
+                        setCurrentEditNews(news);
+                        setEditModalVisible(true);
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => deleteNews(news.title)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            ))
         ) : (
-          <div>No news available.</div>
+          <div>No news available</div>
         )}
       </div>
 
+      {/* Edit News Modal */}
+      <Modal show={editModalVisible} onHide={() => setEditModalVisible(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit News</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div>
+            <input
+              type="text"
+              value={currentEditNews?.title || ""}
+              onChange={(e) =>
+                setCurrentEditNews({
+                  ...currentEditNews,
+                  title: e.target.value,
+                })
+              }
+              className="form-control mb-3"
+            />
+            <textarea
+              value={currentEditNews?.news_content || ""}
+              onChange={(e) =>
+                setCurrentEditNews({
+                  ...currentEditNews,
+                  news_content: e.target.value,
+                })
+              }
+              className="form-control"
+              rows="5"
+            />
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setEditModalVisible(false)}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={updateNews}>
+            Update News
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       {/* Create News Modal */}
-      {createModalVisible && (
-        <Modal
-          show={createModalVisible}
-          onHide={() => setCreateModalVisible(false)}
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>Create News</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                createNews();
-              }}
-            >
-              <div className="mb-3">
-                <label className="form-label">Title</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={newNews.title}
-                  onChange={(e) =>
-                    setNewNews({ ...newNews, title: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Content</label>
-                <textarea
-                  className="form-control"
-                  rows="3"
-                  value={newNews.news_content}
-                  onChange={(e) =>
-                    setNewNews({ ...newNews, news_content: e.target.value })
-                  }
-                  required
-                ></textarea>
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Image URL</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={newNews.news_image}
-                  onChange={(e) =>
-                    setNewNews({ ...newNews, news_image: e.target.value })
-                  }
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Category</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={newNews.category}
-                  onChange={(e) =>
-                    setNewNews({ ...newNews, category: e.target.value })
-                  }
-                />
-              </div>
-              <div className="d-flex justify-content-between">
-                <Button
-                  variant="secondary"
-                  onClick={() => setCreateModalVisible(false)}
-                >
-                  Close
-                </Button>
-                <Button variant="primary" type="submit">
-                  Create News
-                </Button>
-              </div>
-            </form>
-          </Modal.Body>
-        </Modal>
-      )}
+      <Modal show={createModalVisible} onHide={() => setCreateModalVisible(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Create News</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div>
+            <input
+              type="text"
+              placeholder="Title"
+              value={newNews.title}
+              onChange={(e) => setNewNews({ ...newNews, title: e.target.value })}
+              className="form-control mb-3"
+            />
+            <textarea
+              placeholder="Content"
+              value={newNews.news_content}
+              onChange={(e) =>
+                setNewNews({ ...newNews, news_content: e.target.value })
+              }
+              className="form-control"
+              rows="5"
+            />
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setCreateModalVisible(false)}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={createNews}>
+            Create News
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
