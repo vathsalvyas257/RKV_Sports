@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Use useNavigate instead of useHistory
 import TournamentCard from "./TournamentCard";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -7,6 +8,8 @@ export default function Tournaments() {
   const [tournaments, setTournaments] = useState([]);
   const [filteredTournaments, setFilteredTournaments] = useState([]);
   const [filter, setFilter] = useState("all");
+
+  const navigate = useNavigate(); // Corrected to use navigate hook
 
   const displayError = (errorMsg) => {
     toast.error(errorMsg || "Something went wrong.", {
@@ -19,10 +22,7 @@ export default function Tournaments() {
     try {
       const response = await fetch("http://127.0.0.1:8000/TournamentsCreation/");
       const data = await response.json();
-      // console.log(data);
       if (response.ok) {
-        // Sort tournaments by date (assuming 'start_date' is the field you want to use)
-        
         const sortedTournaments = data.sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
         setTournaments(sortedTournaments);
         setFilteredTournaments(sortedTournaments);
@@ -45,11 +45,33 @@ export default function Tournaments() {
           tournament.sport_type &&
           tournament.sport_type.toLowerCase() === selectedFilter.toLowerCase()
       );
-      // Re-sort filtered tournaments after filtering
       const sortedFilteredTournaments = filtered.sort(
         (a, b) => new Date(b.start_date) - new Date(a.start_date)
       );
       setFilteredTournaments(sortedFilteredTournaments);
+    }
+  };
+
+  const handleTournamentClick = (sportType) => {
+    switch (sportType.toLowerCase()) {
+      case "cricket":
+        navigate("/registration/cricket"); // Use navigate instead of history.push
+        break;
+      case "hockey":
+        navigate("/registration/hockey");
+        break;
+      case "badminton":
+        navigate("/registration/badminton");
+        break;
+      case "basketball":
+        navigate("/registration/basketball");
+        break;
+      case "kabaddi":
+        navigate("/registration/kabaddi");
+        break;
+      default:
+        navigate("/registration");
+        break;
     }
   };
 
@@ -58,40 +80,27 @@ export default function Tournaments() {
   }, []);
 
   useEffect(() => {
-    handleFilterChange(filter); // Apply the filter after fetching data
+    handleFilterChange(filter);
   }, [tournaments, filter]);
 
   return (
     <div className="mt-5">
       <h2 className="text-primary mb-4 text-center">Latest Tournaments</h2>
-
-      {/* Center Filter Options */}
-      <div
-        className="mb-4 d-flex gap-2 justify-content-center align-items-center"
-        style={{
-          height: "10vh", // Adjust height as needed
-        }}
-      >
-        {["all", "cricket", "kabaddi", "hockey", "badminton", "basketball"].map(
-          (sport) => (
-            <button
-              key={sport}
-              className={`btn btn-sm ${
-                filter === sport ? "btn-primary" : "btn-outline-primary"
-              }`}
-              onClick={() => handleFilterChange(sport)}
-            >
-              {sport.charAt(0).toUpperCase() + sport.slice(1)}
-            </button>
-          )
-        )}
+      <div className="mb-4 d-flex gap-2 justify-content-center align-items-center" style={{ height: "10vh" }}>
+        {["all", "cricket", "kabaddi", "hockey", "badminton", "basketball"].map((sport) => (
+          <button
+            key={sport}
+            className={`btn btn-sm ${filter === sport ? "btn-primary" : "btn-outline-primary"}`}
+            onClick={() => handleFilterChange(sport)}
+          >
+            {sport.charAt(0).toUpperCase() + sport.slice(1)}
+          </button>
+        ))}
       </div>
-        {/* Display the number of results found */}
-        <p className="text-muted text-center">
+      <p className="text-muted text-center">
         {filteredTournaments.length} {filteredTournaments.length === 1 ? "result" : "results"} found.
       </p>
 
-      {/* Display Tournaments */}
       {filteredTournaments.length > 0 ? (
         <div
           style={{
@@ -102,13 +111,14 @@ export default function Tournaments() {
           }}
         >
           {filteredTournaments.map((tournament, index) => (
-            <TournamentCard key={index} tournament={tournament} />
+            <div key={index} onClick={() => handleTournamentClick(tournament.sport_type)}>
+              <TournamentCard tournament={tournament} />
+            </div>
           ))}
         </div>
       ) : (
         <p className="text-muted text-center">No tournaments available.</p>
       )}
-
       <ToastContainer />
     </div>
   );

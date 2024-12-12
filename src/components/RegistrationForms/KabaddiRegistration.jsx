@@ -1,21 +1,41 @@
 import React, { useState } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
-const KabaddiRegister = () => {
+const KabaddiRegistration = () => {
   const [formValues, setFormValues] = useState({
     teamName: '',
     coachName: '',
-    players: Array(7).fill({ name: '', age: '', position: '' }), // Kabaddi teams usually have 7 players
+    players: Array(7).fill({ name: '', student_id: '', position: '' }),
     phoneNumber: '',
-    email: ''
+    email: '',
+    teamImage: null,
   });
 
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate(); // Initialize useNavigate for redirection
+
+  // Validation function
+  const validateForm = (values) => {
+    const errors = {};
+    if (!values.teamName) errors.teamName = "Team name is required.";
+    if (!values.coachName) errors.coachName = "Coach name is required.";
+    if (!values.phoneNumber) errors.phoneNumber = "Phone number is required.";
+    // Add other validations as necessary
+    values.players.forEach((player, index) => {
+      if (!player.name) errors[`players[${index}].name`] = `Player ${index + 1} name is required.`;
+      if (!player.student_id) errors[`players[${index}].student_id`] = `Player ${index + 1} Student ID is required.`;
+      if (!player.position) errors[`players[${index}].position`] = `Player ${index + 1} position is required.`;
+    });
+    return errors;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormValues((prevValues) => ({
       ...prevValues,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -25,43 +45,77 @@ const KabaddiRegister = () => {
     );
     setFormValues((prevValues) => ({
       ...prevValues,
-      players: updatedPlayers
+      players: updatedPlayers,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      teamImage: file,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const validationErrors = validateForm(formValues);
     setErrors(validationErrors);
 
-    if (Object.keys(validationErrors).length === 0) {
-      console.log('Form submitted:', formValues);
-      alert('Form submitted successfully!');
+    // If there are validation errors, don't submit
+    if (Object.keys(validationErrors).length > 0) return;
+
+    // Preparing data to send to the backend
+    const formData = new FormData();
+    formData.append('team_name', formValues.teamName);
+    formData.append('coach_name', formValues.coachName);
+    formData.append('contact_number', formValues.phoneNumber);
+    formData.append('registration_fee', 100); // Static value for example
+    formData.append('registration_date', new Date().toISOString());
+    formData.append('status', 'Pending');
+    
+    // Append the team image if available
+    if (formValues.teamImage) formData.append('team_profile', formValues.teamImage);
+    
+    // Append player details
+    const playerIds = ['200', '201', '202']; // Example player IDs, adjust based on actual data
+    formData.append('player_ids', playerIds.join(','));
+
+    const playerNames = formValues.players.map(player => player.name).join(',');
+    formData.append('player_names', playerNames);
+    
+    const playerPositions = formValues.players.map(player => player.position).join(',');
+    formData.append('player_positions', playerPositions);
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/TeamsRegistration/', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success('Team registered successfully!');
+        
+        // Redirect after successful registration
+        setTimeout(() => {
+          navigate('/registration-success'); // Redirect to a success page
+        }, 2000); // Redirect after 2 seconds
+      } else {
+        toast.error(`Error: ${data.detail[0].msg}`);
+      }
+    } catch (error) {
+      toast.error('Something went wrong, please try again later!');
+      console.error('Error submitting form:', error);
     }
-  };
-
-  const validateForm = (values) => {
-    const errors = {};
-
-    if (!values.teamName) errors.teamName = 'Team Name is required';
-    if (!values.coachName) errors.coachName = 'Coach Name is required';
-    if (!values.phoneNumber) errors.phoneNumber = 'Phone Number is required';
-    if (!values.email) errors.email = 'Email is required';
-
-    values.players.forEach((player, index) => {
-      if (!player.name) errors[`players[${index}].name`] = 'Player Name is required';
-      if (!player.age) errors[`players[${index}].age`] = 'Player Age is required';
-      if (!player.position) errors[`players[${index}].position`] = 'Player Position is required';
-    });
-
-    return errors;
   };
 
   return (
     <div className="container mt-5 p-4 bg-light rounded shadow">
       <h1 className="text-center mb-4">Kabaddi Tournament Registration Form</h1>
-      
+
       <form onSubmit={handleSubmit}>
         <div className="d-flex">
           <div className="form-group col-md-6 mx-1">
@@ -75,7 +129,7 @@ const KabaddiRegister = () => {
             />
             {errors.teamName && <small className="text-danger">{errors.teamName}</small>}
           </div>
-          
+
           <div className="form-group col-md-6">
             <label>Coach Name</label>
             <input
@@ -95,9 +149,9 @@ const KabaddiRegister = () => {
             <thead className="thead-light">
               <tr>
                 <th>#</th>
-                <th>Name</th>
-                <th>Age</th>
-                <th>Position</th>
+                <th>Name of the Player</th>
+                <th>Collage ID</th>
+                <th>Player Role</th>
               </tr>
             </thead>
             <tbody>
@@ -118,14 +172,14 @@ const KabaddiRegister = () => {
                   </td>
                   <td>
                     <input
-                      type="number"
-                      placeholder="Age"
-                      value={player.age}
-                      onChange={(e) => handlePlayerChange(index, 'age', e.target.value)}
+                      type="text"
+                      placeholder="Student ID"
+                      value={player.student_id}
+                      onChange={(e) => handlePlayerChange(index, 'student_id', e.target.value)}
                       className="form-control"
                     />
-                    {errors[`players[${index}].age`] && (
-                      <small className="text-danger">{errors[`players[${index}].age`]}</small>
+                    {errors[`players[${index}].student_id`] && (
+                      <small className="text-danger">{errors[`players[${index}].student_id`]}</small>
                     )}
                   </td>
                   <td>
@@ -162,23 +216,24 @@ const KabaddiRegister = () => {
         </div>
 
         <div className="form-group">
-          <label>Email</label>
+          <label>Upload Team Image</label>
           <input
-            type="email"
-            name="email"
-            value={formValues.email}
-            onChange={handleChange}
+            type="file"
+            name="teamImage"
+            onChange={handleImageChange}
             className="form-control"
           />
-          {errors.email && <small className="text-danger">{errors.email}</small>}
         </div>
 
         <button type="submit" className="btn btn-primary btn-block mt-4">
           Submit Registration
         </button>
       </form>
+
+      {/* Toast Container */}
+      <ToastContainer />
     </div>
   );
 };
 
-export default KabaddiRegister;
+export default KabaddiRegistration;
