@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
-import { FaMapMarkerAlt, FaCalendarAlt, FaTrophy, FaUsers } from "react-icons/fa";
+import {
+  FaMapMarkerAlt,
+  FaCalendarAlt,
+  FaTrophy,
+  FaUsers,
+} from "react-icons/fa";
 import { useNavigate } from "react-router-dom"; // To navigate on button click
 
 export default function TournamentCard({ tournament, onEdit }) {
@@ -60,14 +65,18 @@ export default function TournamentCard({ tournament, onEdit }) {
         onClick={handleCardClick} // Open modal on card click
       >
         {/* Image Section */}
-        <div
+        <img
+          src={tournament.tournament_image_url || "./rgukt_logo.png"}
+          alt={tournament.tournament_name || "Tournament Image"}
           style={{
-            backgroundImage: `url(${tournament.tournament_image_url || "./rgukt_logo.png"})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            height: "200px", // Adjust image height
+            width: "100%", // Make the image take full width of the card
+            height: "200px", // Set the height for the image
+            objectFit: "cover", // Ensure the image scales without distortion
+            borderTopLeftRadius: "10px", // Match the card's border radius
+            borderTopRightRadius: "10px",
           }}
-        ></div>
+          onError={(e) => (e.target.src = "./rgukt_logo.png")} // Fallback to default image if error
+        />
 
         {/* Text Section */}
         <div
@@ -78,16 +87,31 @@ export default function TournamentCard({ tournament, onEdit }) {
           }}
         >
           <h5 className="card-title">{tournament.tournament_name}</h5>
-          <p className="card-text" style={{ fontSize: "18px" }}>Sport: {tournament.sport_type}</p>
           <p className="card-text" style={{ fontSize: "18px" }}>
-            <FaMapMarkerAlt className="text-danger" style={{ fontSize: "1.5rem" }} /> {tournament.location}
+            Sport: {tournament.sport_type}
           </p>
           <p className="card-text" style={{ fontSize: "18px" }}>
-            <FaCalendarAlt className="text-primary" style={{ fontSize: "1.5rem" }} /> {tournament.start_date} - {tournament.end_date}
+            <FaMapMarkerAlt
+              className="text-danger"
+              style={{ fontSize: "1.5rem" }}
+            />{" "}
+            {tournament.location}
           </p>
           <p className="card-text" style={{ fontSize: "18px" }}>
-            <FaTrophy className="text-warning" style={{ fontSize: "1.5rem" }} /> Prizes:{" "}
-            {[tournament.prize_first_place, tournament.prize_second_place, tournament.prize_third_place]
+            <FaCalendarAlt
+              className="text-primary"
+              style={{ fontSize: "1.5rem" }}
+            />{" "}
+            {tournament.start_date} - {tournament.end_date}
+          </p>
+          <p className="card-text" style={{ fontSize: "18px" }}>
+            <FaTrophy className="text-warning" style={{ fontSize: "1.5rem" }} />{" "}
+            Prizes:{" "}
+            {[
+              tournament.prize_first_place,
+              tournament.prize_second_place,
+              tournament.prize_third_place,
+            ]
               .filter(Boolean)
               .join(", ")}
           </p>
@@ -121,58 +145,108 @@ export default function TournamentCard({ tournament, onEdit }) {
         size="lg" // Use 'sm' for a smaller modal size
         centered
       >
-        <Modal.Header closeButton className="text-center" style={{ textAlign: "center", fontSize: "24px", fontFamily: "Arial, sans-serif" }}>
+        <Modal.Header
+          closeButton
+          className="text-center"
+          style={{
+            textAlign: "center",
+            fontSize: "24px",
+            fontFamily: "Arial, sans-serif",
+          }}
+        >
           <Modal.Title>{selectedTournament?.tournament_name}</Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{ padding: '15px', fontSize: '18px', fontFamily: "Arial, sans-serif" }}>
+        <Modal.Body
+          style={{
+            padding: "15px",
+            fontSize: "18px",
+            fontFamily: "Arial, sans-serif",
+          }}
+        >
           {/* Image Section */}
           <img
             src={selectedTournament?.tournament_image_url || "./rgukt_logo.png"}
             alt={selectedTournament?.tournament_name}
-            style={{ width: "100%", maxHeight: "250px", maxHeight: "400px", objectFit: "cover" }} // Adjust image size
-            onError={(e) => (e.target.src = "https://via.placeholder.com/600x400")}
+            style={{
+              width: "100%",
+              maxHeight: "250px",
+              maxHeight: "400px",
+              objectFit: "cover",
+            }} // Adjust image size
+            onError={(e) =>
+              (e.target.src = "https://via.placeholder.com/600x400")
+            }
           />
-          
+
           {/* Tournament Details */}
           <div className="mt-3">
             <div className="row mb-3">
               <div className="col-6">
                 <div className="d-flex mb-3">
-                  <p><strong>Sport:</strong> {selectedTournament?.sport_type}</p>
+                  <p>
+                    <strong>Sport:</strong> {selectedTournament?.sport_type}
+                  </p>
                 </div>
               </div>
               <div className="col-6">
                 <div className="d-flex align-items-center">
-                  <FaMapMarkerAlt className="text-danger mr-2" style={{ fontSize: "1.5rem" }} />
-                  <p><strong>Location:</strong> {selectedTournament?.location}</p>
-                </div>
-              </div>
-            </div>
-            <div className="row mb-3">
-              <div className="col-6">
-                <div className="d-flex align-items-center">
-                  <FaTrophy className="text-warning mr-2" style={{ fontSize: "1.5rem" }} />
-                  <p><strong>First Place:</strong> {selectedTournament?.prize_first_place}</p>
-                </div>
-              </div>
-              <div className="col-6">
-                <div className="d-flex align-items-center">
-                  <FaTrophy className="text-warning mr-2" style={{ fontSize: "1.5rem" }} />
-                  <p><strong>Second Place:</strong> {selectedTournament?.prize_second_place}</p>
+                  <FaMapMarkerAlt
+                    className="text-danger mr-2"
+                    style={{ fontSize: "1.5rem" }}
+                  />
+                  <p>
+                    <strong>Location:</strong> {selectedTournament?.location}
+                  </p>
                 </div>
               </div>
             </div>
             <div className="row mb-3">
               <div className="col-6">
                 <div className="d-flex align-items-center">
-                  <FaTrophy className="text-warning mr-2" style={{ fontSize: "1.5rem" }} />
-                  <strong> Third Place:</strong> {selectedTournament?.prize_third_place || 'N/A'}
+                  <FaTrophy
+                    className="text-warning mr-2"
+                    style={{ fontSize: "1.5rem" }}
+                  />
+                  <p>
+                    <strong>First Place:</strong>{" "}
+                    {selectedTournament?.prize_first_place}
+                  </p>
                 </div>
               </div>
               <div className="col-6">
                 <div className="d-flex align-items-center">
-                  <FaCalendarAlt className="text-primary mr-2" style={{ fontSize: "1.5rem" }} />
-                  <p><strong>Dates:</strong> {selectedTournament?.start_date} - {selectedTournament?.end_date}</p>
+                  <FaTrophy
+                    className="text-warning mr-2"
+                    style={{ fontSize: "1.5rem" }}
+                  />
+                  <p>
+                    <strong>Second Place:</strong>{" "}
+                    {selectedTournament?.prize_second_place}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="row mb-3">
+              <div className="col-6">
+                <div className="d-flex align-items-center">
+                  <FaTrophy
+                    className="text-warning mr-2"
+                    style={{ fontSize: "1.5rem" }}
+                  />
+                  <strong> Third Place:</strong>{" "}
+                  {selectedTournament?.prize_third_place || "N/A"}
+                </div>
+              </div>
+              <div className="col-6">
+                <div className="d-flex align-items-center">
+                  <FaCalendarAlt
+                    className="text-primary mr-2"
+                    style={{ fontSize: "1.5rem" }}
+                  />
+                  <p>
+                    <strong>Dates:</strong> {selectedTournament?.start_date} -{" "}
+                    {selectedTournament?.end_date}
+                  </p>
                 </div>
               </div>
             </div>
@@ -198,7 +272,9 @@ export default function TournamentCard({ tournament, onEdit }) {
           </Button>
           <Button
             variant="primary"
-            onClick={() => handleRegistrationClick(selectedTournament?.sport_type)}
+            onClick={() =>
+              handleRegistrationClick(selectedTournament?.sport_type)
+            }
           >
             Register
           </Button>

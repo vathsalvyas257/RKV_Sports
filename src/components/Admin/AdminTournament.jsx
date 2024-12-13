@@ -41,7 +41,9 @@ export default function AdminTournament() {
 
   const fetchTournaments = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/TournamentsCreation/");
+      const response = await fetch(
+        "http://127.0.0.1:8000/TournamentsCreation/"
+      );
       const data = await response.json();
       if (response.ok) setTournaments(data.reverse());
       else displayError("Failed to fetch tournaments.");
@@ -53,16 +55,21 @@ export default function AdminTournament() {
 
   const deleteTournament = async (tournamentName) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/TournamentsCreation/?tournament_name=${tournamentName}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `http://127.0.0.1:8000/TournamentsCreation/?tournament_name=${tournamentName}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (response.ok) {
         toast.success("Tournament deleted successfully!");
         fetchTournaments(); // Refresh tournaments list after deletion
       } else {
         const data = await response.json();
-        displayError(data.detail ? data.detail[0].msg : "Failed to delete tournament.");
+        displayError(
+          data.detail ? data.detail[0].msg : "Failed to delete tournament."
+        );
       }
     } catch (error) {
       console.error("Error deleting tournament:", error);
@@ -72,13 +79,16 @@ export default function AdminTournament() {
 
   const updateTournament = async (updatedTournament) => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/TournamentsCreation/", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedTournament),
-      });
+      const response = await fetch(
+        "http://127.0.0.1:8000/TournamentsCreation/",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedTournament),
+        }
+      );
 
       if (response.ok) {
         toast.success("Tournament updated successfully!");
@@ -86,7 +96,9 @@ export default function AdminTournament() {
         handleCloseEditModal();
       } else {
         const data = await response.json();
-        displayError(data.detail ? data.detail[0].msg : "Failed to update tournament.");
+        displayError(
+          data.detail ? data.detail[0].msg : "Failed to update tournament."
+        );
       }
     } catch (error) {
       console.error("Error updating tournament:", error);
@@ -105,7 +117,10 @@ export default function AdminTournament() {
           onClose={handleCloseModal}
           onSuccess={(newTournament) => {
             toast.success("Tournament created successfully!");
-            setTournaments((prevTournaments) => [newTournament, ...prevTournaments]);
+            setTournaments((prevTournaments) => [
+              newTournament,
+              ...prevTournaments,
+            ]);
           }}
           onError={displayError}
         />
@@ -170,15 +185,18 @@ export default function AdminTournament() {
                 onClick={() => handleOpenAdminAcceptModal(tournament)} // Open AdminAccept Modal on card click
               >
                 {/* Image Section */}
-                <div
+                <img
+                  src={tournament.tournament_image_url || "./rgukt_logo.png"}
+                  alt={tournament.tournament_name || "Tournament Image"}
                   style={{
-                    backgroundImage: `url(${tournament.tournament_image_url || "./rgukt_logo.png"})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    height: "200px",
+                    width: "100%", // Make the image take full width of the card
+                    height: "200px", // Set the height for the image
+                    objectFit: "cover", // Ensure the image scales without distortion
+                    borderTopLeftRadius: "10px", // Match the card's border radius
+                    borderTopRightRadius: "10px",
                   }}
-                ></div>
-
+                  onError={(e) => (e.target.src = "./rgukt_logo.png")} // Fallback to default image if error
+                />
                 {/* Text Section */}
                 <div
                   style={{
@@ -190,7 +208,8 @@ export default function AdminTournament() {
                   <h5 className="card-title">{tournament.tournament_name}</h5>
                   <p className="card-text">Sport: {tournament.sport_type}</p>
                   <p className="card-text">
-                    <FaMapMarkerAlt className="text-danger" /> {tournament.location}
+                    <FaMapMarkerAlt className="text-danger" />{" "}
+                    {tournament.location}
                   </p>
                   <p className="card-text">
                     <FaCalendarAlt className="text-primary" />{" "}
@@ -198,7 +217,11 @@ export default function AdminTournament() {
                   </p>
                   <p className="card-text">
                     <FaTrophy className="text-warning" /> Prizes:{" "}
-                    {[tournament.prize_first_place, tournament.prize_second_place, tournament.prize_third_place]
+                    {[
+                      tournament.prize_first_place,
+                      tournament.prize_second_place,
+                      tournament.prize_third_place,
+                    ]
                       .filter(Boolean)
                       .join(", ")}
                   </p>
@@ -211,7 +234,9 @@ export default function AdminTournament() {
                     </button>
                     <button
                       className="btn btn-danger text-white ms-2"
-                      onClick={() => deleteTournament(tournament.tournament_name)}
+                      onClick={() =>
+                        deleteTournament(tournament.tournament_name)
+                      }
                     >
                       Delete
                     </button>
