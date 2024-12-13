@@ -22,7 +22,6 @@ export default function AdminNews({ newsList, setNewsList }) {
     setSelectedNews(news); // Set the selected news for the modal
     setViewModalVisible(true); // Show the modal
   };
-  
 
   // Fetch all news and display latest first
   useEffect(() => {
@@ -209,16 +208,31 @@ export default function AdminNews({ newsList, setNewsList }) {
                   }
                 />
                 <div className="card-body" style={{ paddingLeft: "15px" }}>
-                  <h5 className="card-title " style={{ fontSize: "28px" }}>
+                  <h5
+                    className="card-title "
+                    style={{
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      fontFamily: "bold",
+                      fontSize:"25px",
+                    }}
+                  >
                     {news.title}
                   </h5>
                   <p
                     className="card-text"
                     style={{
-                      fontSize: "18px",
-                      color: "#555",
-                      height: "150px",
+                      maxHeight: "4.5rem", // Adjust height based on desired rows (approx 1.5rem per row)
                       overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      display: "-webkit-box",
+                      WebkitLineClamp: 3, // Number of lines to display
+                      WebkitBoxOrient: "vertical",
+                      // fontSize: "18px",
+                      // color: "#555",
+                      // height: "150px",
+                      // overflow: "hidden",
                     }}
                   >
                     {news.news_content}

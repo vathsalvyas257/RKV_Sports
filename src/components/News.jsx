@@ -52,7 +52,14 @@ export default function News() {
     }
   };
 
-  const categories = ["all", "cricket", "hockey", "kabaddi", "basketball", "badminton"];
+  const categories = [
+    "all",
+    "cricket",
+    "hockey",
+    "kabaddi",
+    "basketball",
+    "badminton",
+  ];
 
   return (
     <div className="container my-5">
@@ -70,7 +77,9 @@ export default function News() {
           <button
             key={category}
             className={`btn btn-sm ${
-              selectedCategory === category ? "btn-primary" : "btn-outline-primary"
+              selectedCategory === category
+                ? "btn-primary"
+                : "btn-outline-primary"
             }`}
             onClick={() => handleFilterChange(category)}
           >
@@ -81,7 +90,8 @@ export default function News() {
 
       {/* Display the number of results found */}
       <p className="text-muted text-center">
-        {filteredNews.length} {filteredNews.length === 1 ? "result" : "results"} found.
+        {filteredNews.length} {filteredNews.length === 1 ? "result" : "results"}{" "}
+        found.
       </p>
 
       {isLoading ? (
@@ -92,22 +102,23 @@ export default function News() {
         <div className="row">
           {filteredNews.map((news) => (
             <div className="col-md-4 mb-4" key={news._id}>
-              <div className="card h-100 shadow-sm"style={{
-                        width: "600px",
-                        height: "600px",
-                      }}>
+              <div
+                className="card h-100 shadow-sm"
+                style={{
+                  width: "100%", // Ensure full width within the column
+                  height: "100%", // Adjust height to fit content
+                }}
+              >
                 <div className="row g-0">
                   {/* Image on one side */}
                   <div className="col-5" onClick={() => handleCardClick(news)}>
                     <img
-
-                     // Fallback image
-
+                      src={news.news_image_url || "./rgukt_logo.png"}
                       alt={news.title}
                       className="img-fluid rounded-start"
                       style={{
-                        width: "100%",
-                        height: "100%",
+                        width: "200px",
+                        height: "200px",
                         objectFit: "cover",
                         borderTopLeftRadius: "5px",
                         borderBottomLeftRadius: "5px",
@@ -121,13 +132,27 @@ export default function News() {
                   {/* Title and description on the other side */}
                   <div className="col-7">
                     <div className="card-body d-flex flex-column">
-                      <h5 className="card-title">{news.title}</h5>
+                      <h5
+                        className="card-title"
+                        style={{
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          fontFamily: "bold",
+                          fontSize:"25px",
+                        }}
+                      >
+                        {news.title}
+                      </h5>
                       <p
                         className="card-text text-muted"
                         style={{
-                          maxHeight: "3rem",
+                          maxHeight: "4.5rem", // Adjust height based on desired rows (approx 1.5rem per row)
                           overflow: "hidden",
                           textOverflow: "ellipsis",
+                          display: "-webkit-box",
+                          WebkitLineClamp: 5, // Number of lines to display
+                          WebkitBoxOrient: "vertical",
                         }}
                       >
                         {news.news_content}
@@ -158,14 +183,19 @@ export default function News() {
             src={selectedNews?.news_image_url || "./rgukt_logo.png"}
             alt={selectedNews?.title}
             style={{ width: "100%", maxHeight: "400px", objectFit: "cover" }}
-            onError={(e) => (e.target.src = "https://via.placeholder.com/600x400")}
+            onError={(e) =>
+              (e.target.src = "https://via.placeholder.com/600x400")
+            }
           />
           <p className="mt-3" style={{ fontSize: "18px" }}>
             {selectedNews?.news_content}
           </p>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setViewModalVisible(false)}>
+          <Button
+            variant="secondary"
+            onClick={() => setViewModalVisible(false)}
+          >
             Close
           </Button>
         </Modal.Footer>

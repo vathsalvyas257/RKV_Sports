@@ -1,6 +1,7 @@
-import React, { createContext, useState, useEffect } from "react";
+import  { createContext, useState, useEffect } from "react";
 import axios from "axios";
 
+// Create a context with a default value (optional)
 const SportsContext = createContext();
 
 export const SportsProvider = ({ children }) => {
