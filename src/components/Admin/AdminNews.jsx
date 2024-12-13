@@ -181,7 +181,7 @@ export default function AdminNews({ newsList, setNewsList }) {
             .reverse() // Reverse the array to display latest items first
             .map((news) => (
               <div
-                onClick={() => handleCardClick(news)}
+                onDoubleClick={() => handleCardClick(news)}
                 key={news._id}
                 className="card shadow-sm border-0"
                 style={{
@@ -332,7 +332,7 @@ export default function AdminNews({ newsList, setNewsList }) {
           </Button>
         </Modal.Footer>
       </Modal>
-      //modal for viewing the news in detail
+      {/* //modal for viewing the news in detail */}
       <Modal
         show={viewModalVisible}
         onHide={() => setViewModalVisible(false)}

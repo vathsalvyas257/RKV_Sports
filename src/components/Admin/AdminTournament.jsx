@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import CreateTournamentModal from "./CreateTournamentModal";
 import EditTournamentModal from "./EditTournamentModal";
+import AdminAccept from "./AdminAccept"; // Import AdminAccept modal
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaMapMarkerAlt, FaCalendarAlt, FaTrophy } from "react-icons/fa";
@@ -8,6 +9,7 @@ import { FaMapMarkerAlt, FaCalendarAlt, FaTrophy } from "react-icons/fa";
 export default function AdminTournament() {
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showAdminAcceptModal, setShowAdminAcceptModal] = useState(false); // New state for AdminAccept modal
   const [tournaments, setTournaments] = useState([]);
   const [selectedTournament, setSelectedTournament] = useState(null);
 
@@ -21,6 +23,16 @@ export default function AdminTournament() {
   const handleCloseEditModal = () => {
     setShowEditModal(false);
     setSelectedTournament(null);
+  };
+
+  const handleOpenAdminAcceptModal = (tournament) => {
+    setSelectedTournament(tournament); // Set the selected tournament to pass it to the modal
+    setShowAdminAcceptModal(true); // Show the modal
+  };
+
+  const handleCloseAdminAcceptModal = () => {
+    setShowAdminAcceptModal(false); // Close the modal
+    setSelectedTournament(null); // Clear the selected tournament
   };
 
   const displayError = (errorMsg) => {
@@ -108,6 +120,19 @@ export default function AdminTournament() {
         />
       )}
 
+      {showAdminAcceptModal && selectedTournament && (
+        <AdminAccept
+          show={showAdminAcceptModal}
+          tournament={selectedTournament}
+          onClose={handleCloseAdminAcceptModal}
+          onRegister={(sportType) => {
+            // Handle registration logic here
+            console.log(`Registering for ${sportType}`);
+            handleCloseAdminAcceptModal();
+          }}
+        />
+      )}
+
       {tournaments.length > 0 ? (
         <div
           className="d-flex"
@@ -140,7 +165,9 @@ export default function AdminTournament() {
                   overflow: "hidden",
                   width: "320px",
                   flexShrink: "0",
+                  cursor: "pointer", // Change cursor to pointer for clickable card
                 }}
+                onClick={() => handleOpenAdminAcceptModal(tournament)} // Open AdminAccept Modal on card click
               >
                 {/* Image Section */}
                 <div

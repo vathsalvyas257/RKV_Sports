@@ -52,7 +52,7 @@ export default function Tournaments() {
     }
   };
 
-  const handleTournamentClick = (sportType) => {
+  const handleRegistrationClick = (sportType) => {
     switch (sportType.toLowerCase()) {
       case "cricket":
         navigate("/registration/cricket"); // Use navigate instead of history.push
@@ -111,8 +111,11 @@ export default function Tournaments() {
           }}
         >
           {filteredTournaments.map((tournament, index) => (
-            <div key={index} onClick={() => handleTournamentClick(tournament.sport_type)}>
+            <div key={index}>
               <TournamentCard tournament={tournament} />
+              <div className="text-center mt-3">
+               
+              </div>
             </div>
           ))}
         </div>

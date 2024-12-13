@@ -92,7 +92,10 @@ export default function News() {
         <div className="row">
           {filteredNews.map((news) => (
             <div className="col-md-4 mb-4" key={news._id}>
-              <div className="card h-100 shadow-sm">
+              <div className="card h-100 shadow-sm"style={{
+                        width: "600px",
+                        height: "600px",
+                      }}>
                 <div className="row g-0">
                   {/* Image on one side */}
                   <div className="col-5" onClick={() => handleCardClick(news)}>
