@@ -100,7 +100,9 @@ export default function News() {
                   {/* Image on one side */}
                   <div className="col-5" onClick={() => handleCardClick(news)}>
                     <img
-                      src={news.news_image_url || "./rgukt_logo.png"}
+
+                     // Fallback image
+
                       alt={news.title}
                       className="img-fluid rounded-start"
                       style={{
