@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 
 const BadmintonRegistration = () => {
@@ -14,7 +14,9 @@ const BadmintonRegistration = () => {
     email: '',
     teamImage: null,
   });
-
+  const location = useLocation();
+  const { sportType, tournamentName } = location.state || {};
+  // console.log(sportType,tournamentName);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false); // New state for submit status
   const navigate = useNavigate();
@@ -76,6 +78,9 @@ const BadmintonRegistration = () => {
     formData.append('registration_fee', 100); // Static value for example
     formData.append('registration_date', new Date().toISOString());
     formData.append('status', 'Pending');
+    formData.append('tournament_name', tournamentName); // Fixed value
+    formData.append('sport_type', sportType); // Fixed value
+    console.log(sportType,tournamentName);
     
     if (formValues.teamImage) formData.append('team_profile', formValues.teamImage);
 
@@ -115,7 +120,7 @@ const BadmintonRegistration = () => {
 
   return (
     <div className="container mt-5 p-4 bg-light rounded shadow">
-      <h1 className="text-center mb-4">Badminton Tournament Registration Form</h1>
+      <h1 className="text-center mb-4">{tournamentName} Registration Form {sportType}</h1>
 
       <form onSubmit={handleSubmit}>
         <div className="d-flex">

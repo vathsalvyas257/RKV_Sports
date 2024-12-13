@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const CricketRegistration = () => {
+  const location = useLocation();
+  const { sportType, tournamentName } = location.state || {};
+  // console.log(sportType,tournamentName);
+
   const [formValues, setFormValues] = useState({
     teamName: '',
     coachName: '',
@@ -14,15 +18,13 @@ const CricketRegistration = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate(); // Initialize useNavigate for redirection
+  const navigate = useNavigate();
 
-  // Validation function
   const validateForm = (values) => {
     const errors = {};
     if (!values.teamName) errors.teamName = "Team name is required.";
     if (!values.coachName) errors.coachName = "Coach name is required.";
     if (!values.phoneNumber) errors.phoneNumber = "Phone number is required.";
-    // Add other validations as necessary
     values.players.forEach((player, index) => {
       if (!player.name) errors[`players[${index}].name`] = `Player ${index + 1} name is required.`;
       if (!player.student_id) errors[`players[${index}].student_id`] = `Player ${index + 1} Student ID is required.`;
@@ -59,62 +61,66 @@ const CricketRegistration = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const validationErrors = validateForm(formValues);
     setErrors(validationErrors);
-
-    // If there are validation errors, don't submit
+  
     if (Object.keys(validationErrors).length > 0) return;
-
-    // Preparing data to send to the backend
+  
     const formData = new FormData();
     formData.append('team_name', formValues.teamName);
     formData.append('coach_name', formValues.coachName);
     formData.append('contact_number', formValues.phoneNumber);
-    formData.append('registration_fee', 100); // Static value for example
+    formData.append('registration_fee', 100); // Example static value
     formData.append('registration_date', new Date().toISOString());
     formData.append('status', 'Pending');
-    
-    // Append the team image if available
+    formData.append('tournament_name',tournamentName);
+    formData.append('sport_type', sportType);
+    console.log(sportType,tournamentName);
+  
     if (formValues.teamImage) formData.append('team_profile', formValues.teamImage);
-    
-    // Append player details
-    const playerIds = ['100', '101', '102']; // Example player IDs, adjust based on actual data
-    formData.append('player_ids', playerIds.join(','));
-    
-    const playerNames = formValues.players.map(player => player.name).join(',');
-    formData.append('player_names', playerNames);
-    
-    const playerPositions = formValues.players.map(player => player.position).join(',');
-    formData.append('player_positions', playerPositions);
-
+  
+    // Extract player details into separate arrays
+    const playerNames = [];
+    const playerIDs = [];
+    const playerPositions = [];
+  
+    formValues.players.forEach((player, index) => {
+      playerNames.push(player.name);
+      playerIDs.push(index + 1); // Use a mock ID for now
+      playerPositions.push(player.position);
+    });
+  
+    formData.append('player_names', playerNames.join(','));
+    formData.append('player_ids', playerIDs.join(','));
+    formData.append('player_positions', playerPositions.join(','));
+  
     try {
       const response = await fetch('http://127.0.0.1:8000/TeamsRegistration/', {
         method: 'POST',
         body: formData,
       });
-
+  
       const data = await response.json();
-
+  
       if (response.ok) {
         toast.success('Team registered successfully!');
-        
-        // Redirect after successful registration
         setTimeout(() => {
-          navigate('/registration-success'); // Redirect to a success page
-        }, 2000); // Redirect after 2 seconds
+          navigate('/registration-success');
+        }, 2000);
       } else {
-        toast.error(`Error: ${data.detail[0].msg}`);
+        toast.error(`Error: ${data.message || 'Unable to register team'}`);
       }
     } catch (error) {
       toast.error('Something went wrong, please try again later!');
       console.error('Error submitting form:', error);
     }
   };
+  
 
   return (
     <div className="container mt-5 p-4 bg-light rounded shadow">
-      <h1 className="text-center mb-4">Cricket Tournament Registration Form</h1>
+      <h1 className="text-center mb-4">{tournamentName} Registration Form {sportType} </h1>
 
       <form onSubmit={handleSubmit}>
         <div className="d-flex">
@@ -150,7 +156,7 @@ const CricketRegistration = () => {
               <tr>
                 <th>#</th>
                 <th>Name of the Player</th>
-                <th>Collage ID</th>
+                <th>Student ID</th>
                 <th>Player Role</th>
               </tr>
             </thead>
@@ -225,13 +231,10 @@ const CricketRegistration = () => {
           />
         </div>
 
-        <button type="submit" className="btn btn-primary btn-block mt-4">
-          Submit Registration
-        </button>
+        <div className="form-group">
+          <button type="submit" className="btn btn-primary btn-block">Submit Registration</button>
+        </div>
       </form>
-
-      {/* Toast Container */}
-      <ToastContainer />
     </div>
   );
 };

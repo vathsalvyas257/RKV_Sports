@@ -55,27 +55,31 @@ export default function AdminTournament() {
 
   const deleteTournament = async (tournamentName) => {
     try {
+      // URL-encode the tournament name to handle spaces and special characters
+      const encodedTournamentName = encodeURIComponent(tournamentName);
+  
       const response = await fetch(
-        `http://127.0.0.1:8000/TournamentsCreation/?tournament_name=${tournamentName}`,
+        `http://127.0.0.1:8000/TournamentsCreation/?tournament_name=${encodedTournamentName}`,
         {
           method: "DELETE",
         }
       );
-
+  
       if (response.ok) {
         toast.success("Tournament deleted successfully!");
         fetchTournaments(); // Refresh tournaments list after deletion
       } else {
         const data = await response.json();
-        displayError(
+        toast.error(
           data.detail ? data.detail[0].msg : "Failed to delete tournament."
         );
       }
     } catch (error) {
       console.error("Error deleting tournament:", error);
-      displayError("Error deleting tournament. Please try again later.");
+      toast.error("Error deleting tournament. Please try again later.");
     }
   };
+  
 
   const updateTournament = async (updatedTournament) => {
     try {
@@ -139,6 +143,8 @@ export default function AdminTournament() {
         <AdminAccept
           show={showAdminAcceptModal}
           tournament={selectedTournament}
+          sportType={selectedTournament.sport_type} // Pass sport type
+          tournamentName={selectedTournament.tournament_name} // Pass tournament name
           onClose={handleCloseAdminAcceptModal}
           onRegister={(sportType) => {
             // Handle registration logic here
@@ -182,7 +188,7 @@ export default function AdminTournament() {
                   flexShrink: "0",
                   cursor: "pointer", // Change cursor to pointer for clickable card
                 }}
-                onClick={() => handleOpenAdminAcceptModal(tournament)} // Open AdminAccept Modal on card click
+                onDoubleClick={() => handleOpenAdminAcceptModal(tournament)} // Open AdminAccept Modal on card click
               >
                 {/* Image Section */}
                 <img
