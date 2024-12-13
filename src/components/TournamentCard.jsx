@@ -16,28 +16,30 @@ export default function TournamentCard({ tournament, onEdit }) {
   const [selectedTournament, setSelectedTournament] = useState(null);
 
   // Handle registration based on sport type
-  const handleRegistrationClick = (sportType) => {
-    switch (sportType.toLowerCase()) {
-      case "cricket":
-        navigate("/registration/cricket");
-        break;
-      case "hockey":
-        navigate("/registration/hockey");
-        break;
-      case "badminton":
-        navigate("/registration/badminton");
-        break;
-      case "basketball":
-        navigate("/registration/basketball");
-        break;
-      case "kabaddi":
-        navigate("/registration/kabaddi");
-        break;
-      default:
-        navigate("/registration");
-        break;
-    }
-  };
+  // Handle registration based on sport type and tournament name
+const handleRegistrationClick = (sportType, tournamentName) => {
+  switch (sportType.toLowerCase()) {
+    case "cricket":
+      navigate("/registration/cricket", { state: { sportType, tournamentName } });
+      break;
+    case "hockey":
+      navigate("/registration/hockey", { state: { sportType, tournamentName } });
+      break;
+    case "badminton":
+      navigate("/registration/badminton", { state: { sportType, tournamentName } });
+      break;
+    case "basketball":
+      navigate("/registration/basketball", { state: { sportType, tournamentName } });
+      break;
+    case "kabaddi":
+      navigate("/registration/kabaddi", { state: { sportType, tournamentName } });
+      break;
+    default:
+      navigate("/registration", { state: { sportType, tournamentName } });
+      break;
+  }
+};
+
 
   // Open the modal and store the selected tournament's details
   const handleCardClick = () => {
@@ -118,12 +120,7 @@ export default function TournamentCard({ tournament, onEdit }) {
 
           {/* Registration Button */}
           <div className="d-flex justify-content-between align-items-center mt-3">
-            <button
-              className="btn btn-primary text-white"
-              onClick={() => handleRegistrationClick(tournament.sport_type)}
-            >
-              Register
-            </button>
+            
 
             {/* Edit Button (if onEdit function is passed) */}
             {onEdit && (
@@ -272,9 +269,7 @@ export default function TournamentCard({ tournament, onEdit }) {
           </Button>
           <Button
             variant="primary"
-            onClick={() =>
-              handleRegistrationClick(selectedTournament?.sport_type)
-            }
+            onClick={() => handleRegistrationClick(tournament.sport_type, tournament.tournament_name)}
           >
             Register
           </Button>
