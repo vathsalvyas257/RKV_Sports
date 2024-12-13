@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaHourglassHalf } from 'react-icons/fa'; // You can use other icons as well, here I used an hourglass to indicate waiting
 
 const RegistrationSuccess = () => {
   const navigate = useNavigate();
@@ -17,7 +18,15 @@ const RegistrationSuccess = () => {
   return (
     <div className="container mt-5 text-center">
       <h1>Registration Successful!</h1>
-      <p>Your team has been successfully registered. You will be redirected to the registration page shortly.</p>
+      <div className="mt-4">
+        <h3>Application Under Process</h3>
+        <p>Your registration is under review. The admin will approve  your application soon.<FaHourglassHalf size={50} color="#FFA500" /></p>
+        
+      </div>
+      <p>You will be redirected to the registration page shortly.</p>
+
+      {/* New message about the application status */}
+      
     </div>
   );
 };

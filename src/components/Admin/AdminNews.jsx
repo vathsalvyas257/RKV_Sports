@@ -9,11 +9,20 @@ export default function AdminNews({ newsList, setNewsList }) {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [currentEditNews, setCurrentEditNews] = useState(null);
+  const [selectedNews, setSelectedNews] = useState(null);
+  const [viewModalVisible, setViewModalVisible] = useState(false);
+
   const [newNews, setNewNews] = useState({
     title: "",
     news_content: "",
     news_image_url: "",
   });
+
+  const handleCardClick = (news) => {
+    setSelectedNews(news); // Set the selected news for the modal
+    setViewModalVisible(true); // Show the modal
+  };
+  
 
   // Fetch all news and display latest first
   useEffect(() => {
@@ -24,7 +33,9 @@ export default function AdminNews({ newsList, setNewsList }) {
 
         if (response.ok) {
           // Sort the news by the created_at field in descending order
-          const sortedNews = data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+          const sortedNews = data.sort(
+            (a, b) => new Date(b.created_at) - new Date(a.created_at)
+          );
           setNewsList(sortedNews); // Update the newsList with sorted news
         } else {
           toast.error("Failed to fetch news.");
@@ -46,7 +57,7 @@ export default function AdminNews({ newsList, setNewsList }) {
       toast.error("Title and content are required!");
       return;
     }
-  
+
     try {
       const response = await fetch("http://127.0.0.1:8000/News/", {
         method: "POST",
@@ -55,16 +66,16 @@ export default function AdminNews({ newsList, setNewsList }) {
         },
         body: JSON.stringify(newNews),
       });
-  
+
       if (response.ok) {
         const createdNewsItem = await response.json();
-  
+
         // Show success toast
         toast.success("News created successfully!");
-  
+
         // Add the newly created news item to the front of the array (latest first)
         setNewsList((prevNews) => [createdNewsItem, ...prevNews]);
-  
+
         // Close modal and reset form
         setCreateModalVisible(false);
         setNewNews({
@@ -89,7 +100,9 @@ export default function AdminNews({ newsList, setNewsList }) {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/News/?title=${encodeURIComponent(currentEditNews.title)}&news_content=${encodeURIComponent(currentEditNews.news_content)}`,
+        `http://127.0.0.1:8000/News/?title=${encodeURIComponent(
+          currentEditNews.title
+        )}&news_content=${encodeURIComponent(currentEditNews.news_content)}`,
         {
           method: "PUT",
           headers: {
@@ -102,7 +115,9 @@ export default function AdminNews({ newsList, setNewsList }) {
         // Update the news in the list
         setNewsList((prevNews) => {
           return prevNews.map((newsItem) =>
-            newsItem.title === currentEditNews.title ? currentEditNews : newsItem
+            newsItem.title === currentEditNews.title
+              ? currentEditNews
+              : newsItem
           );
         });
 
@@ -132,7 +147,9 @@ export default function AdminNews({ newsList, setNewsList }) {
 
       if (response.ok) {
         toast.success("News deleted successfully!");
-        setNewsList((prevNews) => prevNews.filter((news) => news.title !== title)); // Remove the deleted news from the list
+        setNewsList((prevNews) =>
+          prevNews.filter((news) => news.title !== title)
+        ); // Remove the deleted news from the list
       } else {
         toast.error("Error deleting news.");
       }
@@ -164,6 +181,7 @@ export default function AdminNews({ newsList, setNewsList }) {
             .reverse() // Reverse the array to display latest items first
             .map((news) => (
               <div
+                onClick={() => handleCardClick(news)}
                 key={news._id}
                 className="card shadow-sm border-0"
                 style={{
@@ -173,30 +191,33 @@ export default function AdminNews({ newsList, setNewsList }) {
                   display: "flex",
                   flexDirection: "row",
                   height: "250px",
+                  width: "500px",
                   alignItems: "center",
                 }}
               >
                 <img
-                  src={news.news_image || "./rgukt_logo.png"}
+                  src={news.news_image_url || "./rgukt_logo.png"}
                   className="card-img-left"
                   alt={news.title}
                   style={{
-                    width: "120px",
-                    height: "120px",
+                    width: "220px",
+                    height: "180px",
                     objectFit: "cover",
                   }}
-                  onError={(e) => (e.target.src = "https://via.placeholder.com/150")}
+                  onError={(e) =>
+                    (e.target.src = "https://via.placeholder.com/150")
+                  }
                 />
                 <div className="card-body" style={{ paddingLeft: "15px" }}>
-                  <h5 className="card-title" style={{ fontSize: "18px" }}>
+                  <h5 className="card-title " style={{ fontSize: "28px" }}>
                     {news.title}
                   </h5>
                   <p
                     className="card-text"
                     style={{
-                      fontSize: "14px",
+                      fontSize: "18px",
                       color: "#555",
-                      height: "80px",
+                      height: "150px",
                       overflow: "hidden",
                     }}
                   >
@@ -226,7 +247,6 @@ export default function AdminNews({ newsList, setNewsList }) {
           <div>No news available</div>
         )}
       </div>
-
       {/* Edit News Modal */}
       <Modal show={editModalVisible} onHide={() => setEditModalVisible(false)}>
         <Modal.Header closeButton>
@@ -259,7 +279,10 @@ export default function AdminNews({ newsList, setNewsList }) {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setEditModalVisible(false)}>
+          <Button
+            variant="secondary"
+            onClick={() => setEditModalVisible(false)}
+          >
             Close
           </Button>
           <Button variant="primary" onClick={updateNews}>
@@ -267,9 +290,11 @@ export default function AdminNews({ newsList, setNewsList }) {
           </Button>
         </Modal.Footer>
       </Modal>
-
       {/* Create News Modal */}
-      <Modal show={createModalVisible} onHide={() => setCreateModalVisible(false)}>
+      <Modal
+        show={createModalVisible}
+        onHide={() => setCreateModalVisible(false)}
+      >
         <Modal.Header closeButton>
           <Modal.Title>Create News</Modal.Title>
         </Modal.Header>
@@ -279,7 +304,9 @@ export default function AdminNews({ newsList, setNewsList }) {
               type="text"
               placeholder="Title"
               value={newNews.title}
-              onChange={(e) => setNewNews({ ...newNews, title: e.target.value })}
+              onChange={(e) =>
+                setNewNews({ ...newNews, title: e.target.value })
+              }
               className="form-control mb-3"
             />
             <textarea
@@ -294,11 +321,46 @@ export default function AdminNews({ newsList, setNewsList }) {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setCreateModalVisible(false)}>
+          <Button
+            variant="secondary"
+            onClick={() => setCreateModalVisible(false)}
+          >
             Close
           </Button>
           <Button variant="primary" onClick={createNews}>
             Create News
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      //modal for viewing the news in detail
+      <Modal
+        show={viewModalVisible}
+        onHide={() => setViewModalVisible(false)}
+        size="lg"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>{selectedNews?.title}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <img
+            src={selectedNews?.news_image_url || "./rgukt_logo.png"}
+            alt={selectedNews?.title}
+            style={{ width: "100%", maxHeight: "400px", objectFit: "cover" }}
+            onError={(e) =>
+              (e.target.src = "https://via.placeholder.com/600x400")
+            }
+          />
+          <p className="mt-3" style={{ fontSize: "18px" }}>
+            {selectedNews?.news_content}
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setViewModalVisible(false)}
+          >
+            Close
           </Button>
         </Modal.Footer>
       </Modal>
