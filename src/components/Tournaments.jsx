@@ -52,6 +52,8 @@ export default function Tournaments() {
     }
   };
 
+ 
+
   const handleRegistrationClick = (sportType) => {
     switch (sportType.toLowerCase()) {
       case "cricket":
@@ -112,7 +114,7 @@ export default function Tournaments() {
         >
           {filteredTournaments.map((tournament, index) => (
             <div key={index}>
-              <TournamentCard tournament={tournament} />
+              <TournamentCard tournament={tournament}/>
               <div className="text-center mt-3">
                
               </div>

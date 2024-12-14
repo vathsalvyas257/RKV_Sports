@@ -36,9 +36,7 @@ export default function AdminNews({ newsList, setNewsList }) {
             (a, b) => new Date(b.created_at) - new Date(a.created_at)
           );
           setNewsList(sortedNews); // Update the newsList with sorted news
-        } else {
-          toast.error("Failed to fetch news.");
-        }
+        } 
 
         setLoading(false); // Stop loading after data is fetched
       } catch (error) {

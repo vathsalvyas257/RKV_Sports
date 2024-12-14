@@ -224,9 +224,9 @@ export default function AdminTournament() {
                   <p className="card-text">
                     <FaTrophy className="text-warning" /> Prizes:{" "}
                     {[
-                      tournament.prize_first_place,
-                      tournament.prize_second_place,
-                      tournament.prize_third_place,
+                      tournament.prize.first_place,
+                      tournament.prize.second_place,
+                      tournament.prize.third_place,
                     ]
                       .filter(Boolean)
                       .join(", ")}
