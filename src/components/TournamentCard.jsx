@@ -157,9 +157,9 @@ export default function TournamentCard({ tournament, onEdit }) {
             <FaTrophy className="text-warning" style={{ fontSize: "1.5rem" }} />{" "}
             Prizes:{" "}
             {[
-              tournament.prize_first_place,
-              tournament.prize_second_place,
-              tournament.prize_third_place,
+              tournament.prize.first_place,
+              tournament.prize.second_place,
+              tournament.prize.third_place,
             ]
               .filter(Boolean)
               .join(", ")}
@@ -287,7 +287,7 @@ export default function TournamentCard({ tournament, onEdit }) {
 
             {/* Registered Teams */}
             <h5 className="text-center mt-4">
-              Approved Teams for {selectedTournament?.tournament_name}:
+              Participant Teams for  {selectedTournament?.tournament_name}
             </h5>
             <div className="row mt-3">
               {approvedTeams.length > 0 ? (

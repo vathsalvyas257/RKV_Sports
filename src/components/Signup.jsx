@@ -1,6 +1,8 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom"; // For navigation
 import AuthContext from "./context/AuthContext";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Signup = () => {
   const { signup } = useContext(AuthContext);
@@ -24,8 +26,8 @@ const Signup = () => {
   const handleChange = (e) => {
     if (e.target.name === "image") {
       const file = e.target.files[0];
-      if (file && file.size > 2 * 1024 * 1024) { // Limit to 2MB
-        setStatusMessage("File size must be less than 2MB");
+      if (file && file.size > 2 * 1024 * 1024) {
+        toast.error("File size must be less than 2MB");
         return;
       }
       setFormData({ ...formData, image: file });
@@ -44,21 +46,47 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setStatusMessage(""); // Clear previous messages
-
+  
+    const formDataToSend = new FormData();
+    formDataToSend.append("student_name", formData.name);
+    formDataToSend.append("student_id", formData.id);
+    formDataToSend.append("year", formData.year);
+    formDataToSend.append("mail", formData.email);
+    formDataToSend.append("gender", formData.gender);
+    formDataToSend.append("password", formData.password);
+    if (formData.image) {
+      formDataToSend.append("profile_image", formData.image);
+    }
+  
     try {
-      await signup(formData);
-      setStatusMessage("Signup successful!");
-      setTimeout(() => navigate("/login"), 1500); // Navigate after success
+      const response = await fetch("http://127.0.0.1:8000/students/", {
+        method: "POST",
+        body: formDataToSend,
+      });
+  
+      if (response.ok) {
+        toast.success("User created successfully!");
+  
+        // Delay navigation to allow toast to display
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000); // 2 seconds delay
+      } else if (response.status === 409) {
+        toast.error("The ID or email is already registered.");
+      } else {
+        const error = await response.json();
+        toast.error(error?.detail?.[0]?.msg || "Failed to create user.");
+      }
     } catch (err) {
-      setStatusMessage(err.message); // Display error message
+      toast.error("An error occurred. Please try again later.");
     } finally {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
+      <ToastContainer position="top-right" autoClose={3000} />
       <div
         className="card shadow p-5"
         style={{ width: "100%", maxWidth: "600px", borderRadius: "12px", overflow: "auto" }}
@@ -66,18 +94,6 @@ const Signup = () => {
         <h2 className="text-center mb-4" style={{ fontWeight: "bold", fontSize: "1.8em", color: "#333" }}>
           Sign Up
         </h2>
-        
-        {/* Error or Status Messages */}
-        {statusMessage && (
-          <div
-            className={`alert ${
-              statusMessage.includes("successful") ? "alert-success" : "alert-danger"
-            } text-center`}
-            role="alert"
-          >
-            {statusMessage}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">

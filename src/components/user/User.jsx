@@ -1,7 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  FaUser,
+  FaEnvelope,
+  FaVenusMars,
+  FaIdCard,
+  FaEdit,
+  FaSave,
+  FaTimes,
+  FaSignOutAlt,
+} from "react-icons/fa";
+
 export default function User() {
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -11,6 +22,7 @@ export default function User() {
     student_id: "",
     gender: "",
   });
+  const [teams, setTeams] = useState([]);
 
   const getDetails = async (id) => {
     try {
@@ -28,46 +40,68 @@ export default function User() {
         student_id: data.student_id,
         gender: data.gender,
       });
+      fetchTeams(data.student_id);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const fetchTeams = async (studentId) => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/TeamsRegistration/", {
+        method: "GET",
+      });
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+      const data = await response.json();
+
+      const userTeams = data.filter((team) =>
+        team.players.some((player) =>
+          player.player_id.split(",").includes(studentId)
+        )
+      );
+      setTeams(userTeams);
     } catch (err) {
       setError(err.message);
     }
   };
 
   const handleEdit = async () => {
+    console.log("edit handle");
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/students/${formData.student_id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            student_name: formData.student_name,
-            mail: formData.mail,
-            gender: formData.gender,
-          }),
-        }
-      );
+      const response = await fetch(`http://127.0.0.1:8000/students/${formData.student_id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          student_name: formData.student_name,
+          mail: formData.mail,
+          gender: formData.gender,
+        }),
+      });
+  
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
+  
       const data = await response.json();
-      alert(data.message);
+      alert(data.message || "Details updated successfully!");
       setIsEditing(false);
-      getDetails(formData.student_id);
+      getDetails(formData.student_id); // Refresh user details
     } catch (err) {
+      console.error("Error during update:", err);
       setError(err.message);
     }
   };
-
+  
+  
   const handleLogout = () => {
-    // Clear user data and redirect to login
     setUser(null);
     alert("Logged out successfully!");
-    navigate("/login")
+    navigate("/login");
     localStorage.removeItem("token");
-    // Redirect logic can be added here
   };
 
   useEffect(() => {
@@ -83,96 +117,133 @@ export default function User() {
   }
 
   return (
-    <div className="container d-flex flex-column flex-md-row align-items-center" style={{ padding: "1rem" }}>
-      <div className="col-12 col-md-4 d-flex flex-column align-items-center mb-3 mb-md-0">
-        <img
-          src={user.profile_url || "/passport.jpg"}
-          className="card-img-top rounded-circle"
-          alt="Profile"
-          style={{
-            width: "200px",
-            height: "200px",
-            objectFit: "cover",
-            margin: "1rem auto",
-          }}
-        />
-      </div>
-      <div className="col-12 col-md-8">
-        {isEditing ? (
-          <div>
-            <div className="mb-2">
-              <label>User Name:</label>
-              <input
-                type="text"
-                className="form-control"
-                value={formData.student_name}
-                onChange={(e) =>
-                  setFormData({ ...formData, student_name: e.target.value })
-                }
-              />
+    <section className="vh-100" style={{ backgroundColor: "#f4f5f7", overflowY: "auto" }}>
+      <div className="container py-5 h-100">
+        <div className="row d-flex justify-content-center align-items-center h-100">
+          <div className="col-lg-6">
+            <div className="card" style={{ borderRadius: ".5rem", maxHeight: "90vh", overflowY: "auto" }}>
+              {/* Top Right Buttons */}
+              <div
+                className="position-absolute"
+                style={{
+                  top: "10px",
+                  right: "20px",
+                  display: "flex",
+                  gap: "10px",
+                }}
+              >
+                {!isEditing && (
+                  <>
+                    <button className="btn btn-primary"  onClick={() => setIsEditing(true)} >
+                      <FaEdit /> Edit
+                    </button>
+                    <button className="btn btn-danger" onClick={handleLogout}>
+                      <FaSignOutAlt /> Logout
+                    </button>
+                  </>
+                )}
+              </div>
+              <div className="card-body text-center">
+                {/* Profile Image Section */}
+                <div className="position-relative mb-4">
+                  <img
+                    src={user.profile_url || "/passport.jpg"}
+                    alt="Avatar"
+                    className="rounded-circle shadow-4-strong"
+                    style={{
+                      width: "120px",
+                      height: "120px",
+                      objectFit: "cover",
+                    }}
+                  />
+                </div>
+                {/* Details Section */}
+                <div className="text-start ps-4">
+                  {isEditing ? (
+                    <div>
+                      {[{ label: "User Name", value: formData.student_name, key: "student_name" },
+                      { label: "Email", value: formData.mail, key: "mail" },
+                      { label: "Gender", value: formData.gender, key: "gender" }].map((field) => (
+                        <div key={field.key} className="mb-3 d-flex align-items-center">
+                          <label
+                            className="form-label me-3"
+                            style={{ width: "120px", fontWeight: "bold" }}
+                          >
+                            {field.label}:
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={field.value}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                [field.key]: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                      ))}
+                      <div className="d-flex justify-content-end">
+                        <button className="btn btn-success me-2" onClick={handleEdit}>
+                          <FaSave /> Save
+                        </button>
+                        <button className="btn btn-secondary" onClick={() => setIsEditing(false)}>
+                          <FaTimes /> Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      {[{ label: "Student ID", value: user.student_id },
+                      { label: "User Name", value: user.student_name },
+                      { label: "Email", value: user.mail },
+                      { label: "Gender", value: user.gender }].map((field) => (
+                        <div key={field.label} className="mb-3 d-flex align-items-center">
+                          <span
+                            className="me-3"
+                            style={{ fontWeight: "bold", width: "120px" }}
+                          >
+                            {field.label}:
+                          </span>
+                          <span>{field.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <hr />
+                <div className="text-start ps-4">
+                  <h5 className="mb-3">Teams</h5>
+                  {teams.length > 0 ? (
+                    <div className="row">
+                      {teams.map((team) => (
+                        <div key={team._id} className="col-md-6 mb-3">
+                          <div className="d-flex align-items-center">
+                            <img
+                              src={team.team_profile_url}
+                              alt={team.team_name}
+                              className="rounded me-3"
+                              style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                            />
+                            <div>
+                              <strong>{team.team_name}</strong> - {team.tournament_name}
+                              <br />
+                              <small>Sport: {team.sport_type}</small>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p>No teams found.</p>
+                  )}
+                </div>
+              </div>
             </div>
-            <div className="mb-2">
-              <label>Email:</label>
-              <input
-                type="email"
-                className="form-control"
-                value={formData.mail}
-                onChange={(e) =>
-                  setFormData({ ...formData, mail: e.target.value })
-                }
-              />
-            </div>
-            <div className="mb-2">
-              <label>Gender:</label>
-              <input
-                type="text"
-                className="form-control"
-                value={formData.gender}
-                onChange={(e) =>
-                  setFormData({ ...formData, gender: e.target.value })
-                }
-              />
-            </div>
-            <button className="btn btn-success me-2" onClick={handleEdit}>
-              Save
-            </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => setIsEditing(false)}
-            >
-              Cancel
-            </button>
           </div>
-        ) : (
-          <>
-            <div className="row mb-2">
-              <div className="col-4 fw-bold">Student ID:</div>
-              <div className="col-8">{user.student_id}</div>
-            </div>
-            <div className="row mb-2">
-              <div className="col-4 fw-bold">User Name:</div>
-              <div className="col-8">{user.student_name}</div>
-            </div>
-            <div className="row mb-2">
-              <div className="col-4 fw-bold">Email:</div>
-              <div className="col-8">{user.mail}</div>
-            </div>
-            <div className="row mb-2">
-              <div className="col-4 fw-bold">Gender:</div>
-              <div className="col-8">{user.gender}</div>
-            </div>
-            <button
-              className="btn btn-primary me-2"
-              onClick={() => setIsEditing(true)}
-            >
-              Edit
-            </button>
-            <button className="btn btn-danger" onClick={handleLogout}>
-              Logout
-            </button>
-          </>
-        )}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
