@@ -69,17 +69,23 @@ export default function User() {
 
   const handleEdit = async () => {
     console.log("edit handle");
+
+  
+    // Construct the query string with the student details
+    const queryParams = new URLSearchParams({
+      student_id: formData.student_id, // Required
+      student_name: formData.student_name, // Required
+      year: formData.year || "", // Optional
+      mail: formData.mail, // Required
+      gender: formData.gender, // Required, // Optional
+    }).toString();
+  
     try {
-      const response = await fetch(`http://127.0.0.1:8000/students/${formData.student_id}`, {
+      const response = await fetch(`http://127.0.0.1:8000/students/?${queryParams}`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json",
+          "Accept": "application/json",
         },
-        body: JSON.stringify({
-          student_name: formData.student_name,
-          mail: formData.mail,
-          gender: formData.gender,
-        }),
       });
   
       if (!response.ok) {
@@ -98,10 +104,11 @@ export default function User() {
   
   
   const handleLogout = () => {
-    setUser(null);
-    alert("Logged out successfully!");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("student_id");
+    localStorage.removeItem("refreshToken");
+    // window.location.reload();
     navigate("/login");
-    localStorage.removeItem("token");
   };
 
   useEffect(() => {
@@ -130,11 +137,12 @@ export default function User() {
                   right: "20px",
                   display: "flex",
                   gap: "10px",
+                  zIndex:"10"
                 }}
               >
                 {!isEditing && (
                   <>
-                    <button className="btn btn-primary"  onClick={() => setIsEditing(true)} >
+                    <button className="btn btn-primary z-index-1"  onClick={() => setIsEditing(true)} >
                       <FaEdit /> Edit
                     </button>
                     <button className="btn btn-danger" onClick={handleLogout}>

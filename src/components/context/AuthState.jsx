@@ -76,7 +76,7 @@ const AuthState = ({ children }) => {
       if (!response.ok) {
         throw new Error("Invalid login credentials.");
       }
-
+      localStorage.setItem("student_id",credentials.username);
       const data = await response.json();
 
       // Store tokens in localStorage

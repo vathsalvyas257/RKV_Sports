@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "./context/AuthContext";
 
 const LoginPage = () => {
@@ -8,7 +8,9 @@ const LoginPage = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(error);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -27,10 +29,15 @@ const LoginPage = () => {
     if (!validateForm()) return;
     setLoading(true);
     try {
-      localStorage.setItem("student_id",formData.ID);
-      await login({ username: formData.ID, password: formData.password });
+      const result = await login({ username: formData.ID, password: formData.password });
+      if (result.error) {
+        setErrorMessage(result.error); // Set the error message if login fails
+      } else {
+        setErrorMessage(""); // Clear error message on successful login
+      }
     } catch (err) {
-      setErrorMessage(err.message);
+      console.error("Login failed:", err); // Log the error to the console for debugging
+      setErrorMessage("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -39,7 +46,7 @@ const LoginPage = () => {
   useEffect(() => {
     if (error) {
       setErrorMessage(error);
-      const timer = setTimeout(() => setErrorMessage(null), 5000);
+      const timer = setTimeout(() => setErrorMessage(""), 5000); // Clear the error after 5 seconds
       return () => clearTimeout(timer);
     }
   }, [error]);
@@ -85,9 +92,8 @@ const LoginPage = () => {
                 placeholder="Enter your password"
                 required
               />
-              
-              {errors.password && <div className="invalid-feedback">{errors.password}</div>}
             </div>
+            {errors.password && <div className="invalid-feedback">{errors.password}</div>}
           </div>
 
           {/* Submit Button */}

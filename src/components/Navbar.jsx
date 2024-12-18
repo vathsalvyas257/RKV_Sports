@@ -74,9 +74,12 @@ export default function Navbar() {
               </Link>
             </li>
             <li className="nav-item">
+              {localStorage.getItem("student_id")==="Admin"?<Link className={`nav-link ${isActive("/admin")}`} to="/admin">
+                Admin Panel
+              </Link>:
               <Link className={`nav-link ${isActive("/dept")}`} to="/dept">
                 Department
-              </Link>
+              </Link>}
             </li>
             {localStorage.getItem("student_id")? (
               <li className="nav-item dropdown">

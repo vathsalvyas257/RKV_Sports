@@ -49,7 +49,9 @@ function App() {
                   <Route exact path="/tournaments" element={<Tournaments />} />
                   <Route exact path="/livescores" element={<Livescore />} />
                   <Route exact path="/news" element={<News />} />
-                  <Route exact path="/dept" element={<AdminPage />} />
+                  <Route exact path="/dept" element={<Dept />} />
+                  <Route exact path="/admin" element={<AdminPage/>} />
+
                   <Route exact path="/login" element={<Login />} />
                   <Route exact path="/profile" element={<User />} />
                   <Route exact path="/signup" element={<Signup />} />
