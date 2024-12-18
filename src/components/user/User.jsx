@@ -21,6 +21,7 @@ export default function User() {
     mail: "",
     student_id: "",
     gender: "",
+    year: "",
   });
   const [teams, setTeams] = useState([]);
 
@@ -39,6 +40,7 @@ export default function User() {
         mail: data.mail,
         student_id: data.student_id,
         gender: data.gender,
+        year: data.year || "", // Default to empty if not provided
       });
       fetchTeams(data.student_id);
     } catch (err) {
@@ -68,30 +70,26 @@ export default function User() {
   };
 
   const handleEdit = async () => {
-    console.log("edit handle");
-
-  
-    // Construct the query string with the student details
     const queryParams = new URLSearchParams({
-      student_id: formData.student_id, // Required
-      student_name: formData.student_name, // Required
-      year: formData.year || "", // Optional
-      mail: formData.mail, // Required
-      gender: formData.gender, // Required, // Optional
+      student_id: formData.student_id,
+      student_name: formData.student_name,
+      year: formData.year || "",
+      mail: formData.mail,
+      gender: formData.gender,
     }).toString();
-  
+
     try {
       const response = await fetch(`http://127.0.0.1:8000/students/?${queryParams}`, {
         method: "PUT",
         headers: {
-          "Accept": "application/json",
+          Accept: "application/json",
         },
       });
-  
+
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
-  
+
       const data = await response.json();
       alert(data.message || "Details updated successfully!");
       setIsEditing(false);
@@ -101,13 +99,11 @@ export default function User() {
       setError(err.message);
     }
   };
-  
-  
+
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("student_id");
     localStorage.removeItem("refreshToken");
-    // window.location.reload();
     navigate("/login");
   };
 
@@ -129,7 +125,6 @@ export default function User() {
         <div className="row d-flex justify-content-center align-items-center h-100">
           <div className="col-lg-6">
             <div className="card" style={{ borderRadius: ".5rem", maxHeight: "90vh", overflowY: "auto" }}>
-              {/* Top Right Buttons */}
               <div
                 className="position-absolute"
                 style={{
@@ -137,12 +132,12 @@ export default function User() {
                   right: "20px",
                   display: "flex",
                   gap: "10px",
-                  zIndex:"10"
+                  zIndex: "10",
                 }}
               >
                 {!isEditing && (
                   <>
-                    <button className="btn btn-primary z-index-1"  onClick={() => setIsEditing(true)} >
+                    <button className="btn btn-primary" onClick={() => setIsEditing(true)}>
                       <FaEdit /> Edit
                     </button>
                     <button className="btn btn-danger" onClick={handleLogout}>
@@ -152,7 +147,6 @@ export default function User() {
                 )}
               </div>
               <div className="card-body text-center">
-                {/* Profile Image Section */}
                 <div className="position-relative mb-4">
                   <img
                     src={user.profile_url || "/passport.jpg"}
@@ -165,13 +159,14 @@ export default function User() {
                     }}
                   />
                 </div>
-                {/* Details Section */}
                 <div className="text-start ps-4">
                   {isEditing ? (
                     <div>
-                      {[{ label: "User Name", value: formData.student_name, key: "student_name" },
-                      { label: "Email", value: formData.mail, key: "mail" },
-                      { label: "Gender", value: formData.gender, key: "gender" }].map((field) => (
+                      {[
+                        { label: "User Name", value: formData.student_name, key: "student_name" },
+                        { label: "Email", value: formData.mail, key: "mail" },
+                        { label: "Gender", value: formData.gender, key: "gender" },
+                      ].map((field) => (
                         <div key={field.key} className="mb-3 d-flex align-items-center">
                           <label
                             className="form-label me-3"
@@ -192,6 +187,28 @@ export default function User() {
                           />
                         </div>
                       ))}
+                      <div className="mb-3 d-flex align-items-center">
+                        <label
+                          className="form-label me-3"
+                          style={{ width: "120px", fontWeight: "bold" }}
+                        >
+                          Year:
+                        </label>
+                        <select
+                          className="form-select"
+                          value={formData.year}
+                          onChange={(e) =>
+                            setFormData({ ...formData, year: e.target.value })
+                          }
+                        >
+                          <option value="">Select Year</option>
+                          <option value="1st Year">1st Year</option>
+                          <option value="2nd Year">2nd Year</option>
+                          <option value="3rd Year">3rd Year</option>
+                          <option value="4th Year">4th Year</option>
+                          <option value="Admin">Admin</option>
+                        </select>
+                      </div>
                       <div className="d-flex justify-content-end">
                         <button className="btn btn-success me-2" onClick={handleEdit}>
                           <FaSave /> Save
@@ -203,10 +220,13 @@ export default function User() {
                     </div>
                   ) : (
                     <div>
-                      {[{ label: "Student ID", value: user.student_id },
-                      { label: "User Name", value: user.student_name },
-                      { label: "Email", value: user.mail },
-                      { label: "Gender", value: user.gender }].map((field) => (
+                      {[
+                        { label: "Student ID", value: user.student_id },
+                        { label: "User Name", value: user.student_name },
+                        { label: "Email", value: user.mail },
+                        { label: "Gender", value: user.gender },
+                        { label: "Year", value: user.year || "N/A" },
+                      ].map((field) => (
                         <div key={field.label} className="mb-3 d-flex align-items-center">
                           <span
                             className="me-3"

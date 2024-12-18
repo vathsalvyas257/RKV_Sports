@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // Import carousel styles
 import SportsContext, { SportsProvider } from "./context/SportsContext";
-
+import {Link} from 'react-router-dom'
 
 export default function Home() {
   const {carouselImages,addCarouselImage}=useContext(SportsContext);
@@ -180,7 +180,7 @@ export default function Home() {
             exciting tournament filled with action and enthusiasm. Compete,
             showcase your skills, and be a part of this thrilling sports event!
             <br />
-            <a href="/">view more</a>
+            <Link to="/news">view more</Link>
           </p>
         </div>
       </div>
@@ -204,7 +204,7 @@ export default function Home() {
             exciting tournament filled with action and enthusiasm. Compete,
             showcase your skills, and be a part of this thrilling sports event!
             <br />
-            <a href="/">view more</a>
+            <Link href="/tournaments">view more</Link>
           </p>
         </div>
         <div className="col-12 col-md-6 d-flex flex-column align-items-center mb-3 mb-md-0 ">

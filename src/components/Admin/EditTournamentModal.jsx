@@ -4,40 +4,20 @@ import { FaCalendarAlt, FaMapMarkerAlt, FaTrophy } from "react-icons/fa";
 const EditTournamentModal = ({ tournament, onClose, onSuccess, onError }) => {
   const [formData, setFormData] = useState({
     tournament_name: tournament.tournament_name,
-    sport_type: tournament.sport_type,
+    sport_type: tournament.sport_type||"Cricket",
     location: tournament.location,
     start_date: tournament.start_date,
     end_date: tournament.end_date,
-    max_teams: tournament.max_teams || "",
-    team_size: tournament.team_size || "",
-    prize_first_place: tournament.prize_first_place || "",
-    prize_second_place: tournament.prize_second_place || "",
-    prize_third_place: tournament.prize_third_place || "",
-    rules: tournament.rules || "",
-    match_format: tournament.match_format || "",
-    entry_fee: tournament.entry_fee || "",
-    sport_specific_details: tournament.sport_specific_details || "",
+    max_teams: tournament.max_teams || "10",
+    team_size: tournament.team_size || "11",
+    prize_first_place: tournament.prize_first_place || "1000",
+    prize_second_place: tournament.prize_second_place || "500",
+    prize_third_place: tournament.prize_third_place || "100",
+    rules: tournament.rules || "None",
+    match_format: tournament.match_format || "No particular format",
+    entry_fee: tournament.entry_fee || "0",
+    sport_specific_details: tournament.sport_specific_details || "New tournament going happen",
   });
-
-  useEffect(() => {
-    // Initialize form data with tournament details
-    setFormData({
-      tournament_name: tournament.tournament_name,
-      sport_type: tournament.sport_type,
-      location: tournament.location,
-      start_date: tournament.start_date,
-      end_date: tournament.end_date,
-      max_teams: tournament.max_teams || "",
-      team_size: tournament.team_size || "",
-      prize_first_place: tournament.prize_first_place || "",
-      prize_second_place: tournament.prize_second_place || "",
-      prize_third_place: tournament.prize_third_place || "",
-      rules: tournament.rules || "",
-      match_format: tournament.match_format || "",
-      entry_fee: tournament.entry_fee || "",
-      sport_specific_details: tournament.sport_specific_details || "",
-    });
-  }, [tournament]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,20 +26,24 @@ const EditTournamentModal = ({ tournament, onClose, onSuccess, onError }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Filter out the unmodified tournament_name since it's not being updated
     const updatedTournament = { ...formData };
+  
+    // Build query parameters from the formData
+    const queryParams = new URLSearchParams(updatedTournament).toString();
+  
     try {
-      const response = await fetch("http://127.0.0.1:8000/TournamentsCreation/", {
+      const response = await fetch(`http://127.0.0.1:8000/TournamentsCreation/?${queryParams}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatedTournament),
       });
-
+  
       if (response.ok) {
         onSuccess(updatedTournament);
+        onClose(); // Close the modal after successful update
       } else {
         const data = await response.json();
         onError(data.detail ? data.detail[0].msg : "Failed to update tournament.");
@@ -69,6 +53,8 @@ const EditTournamentModal = ({ tournament, onClose, onSuccess, onError }) => {
       onError("Error updating tournament. Please try again later.");
     }
   };
+  
+  
 
   return (
     <div className="modal fade show" style={{ display: "block" }} aria-hidden="true">
