@@ -1,10 +1,11 @@
-import React, { useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
-import AuthContext from "./context/AuthContext";
 
 export default function Navbar() {
   const location = useLocation();
-  const { userIn,user } = useContext(AuthContext);
+  const [user, setUser] = useState(null);
+  let student_id=localStorage.getItem("student_id");
+  const [loginStatus, setLoginStatus] = useState(student_id); // Track login status
   const navigate = useNavigate();
 
   const isActive = (path) => (location.pathname === path ? "active" : "");
@@ -13,14 +14,49 @@ export default function Navbar() {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("student_id");
     localStorage.removeItem("refreshToken");
-    // window.location.reload();
+    setLoginStatus(""); // Update login status
+    setUser(null); // Clear user data
     navigate("/login");
   };
+
+  const fetchUserDetails = async () => {
+    try {
+      const studentId = localStorage.getItem("student_id");
+      if (!studentId) return;
+
+      const response = await fetch(
+        `http://127.0.0.1:8000/students/${studentId}`,
+        { method: "GET" }
+      );
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+      const data = await response.json();
+      setUser(data);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserDetails();
+  }, [setLoginStatus]);
+  // Watch for changes in localStorage student_id
+  useEffect(() => {
+    fetchUserDetails();
+    const handleStorageChange = () => {
+      setLoginStatus(localStorage.getItem("student_id"));
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
       <div className="container-fluid">
-        {/* Logo and Title Section */}
         <div className="d-flex align-items-center">
           <img src="/rgukt_logo.png" alt="logo" style={{ maxHeight: "50px" }} />
           <span
@@ -38,8 +74,6 @@ export default function Navbar() {
             RkvSports
           </span>
         </div>
-
-        {/* Navigation Links */}
         <button
           className="navbar-toggler ms-auto"
           type="button"
@@ -59,12 +93,18 @@ export default function Navbar() {
               </Link>
             </li>
             <li className="nav-item">
-              <Link className={`nav-link ${isActive("/tournaments")}`} to="/tournaments">
+              <Link
+                className={`nav-link ${isActive("/tournaments")}`}
+                to="/tournaments"
+              >
                 Tournaments
               </Link>
             </li>
             <li className="nav-item">
-              <Link className={`nav-link ${isActive("/livescores")}`} to="/livescores">
+              <Link
+                className={`nav-link ${isActive("/livescores")}`}
+                to="/livescores"
+              >
                 Live Scores
               </Link>
             </li>
@@ -74,14 +114,20 @@ export default function Navbar() {
               </Link>
             </li>
             <li className="nav-item">
-              {localStorage.getItem("student_id")==="Admin"?<Link className={`nav-link ${isActive("/admin")}`} to="/admin">
-                Admin Panel
-              </Link>:
-              <Link className={`nav-link ${isActive("/dept")}`} to="/dept">
-                Department
-              </Link>}
+              {localStorage.getItem("student_id") === "Admin" ? (
+                <Link
+                  className={`nav-link ${isActive("/admin")}`}
+                  to="/admin"
+                >
+                  Admin Panel
+                </Link>
+              ) : (
+                <Link className={`nav-link ${isActive("/dept")}`} to="/dept">
+                  Department
+                </Link>
+              )}
             </li>
-            {localStorage.getItem("student_id")? (
+            {localStorage.getItem("student_id") ? (
               <li className="nav-item dropdown">
                 <a
                   className="nav-link dropdown-toggle"
@@ -92,15 +138,17 @@ export default function Navbar() {
                   aria-expanded="false"
                 >
                   <img
-                    src={user.profileImage || "/default-avatar.png"}
+                    src={ "/profile.jpeg"}
                     alt="profile"
                     style={{
                       maxHeight: "40px",
-                      borderRadius: "50%",
+                      borderRadius: "52%",
                       border: "2px solid white",
                     }}
                   />
-                  <span className="ms-2">{user.student_name}</span>
+                  {/* <span className="ms-2">
+                    {user?.student_name || "Loading..."}
+                  </span> */}
                 </a>
                 <ul
                   className="dropdown-menu dropdown-menu-end"
@@ -112,10 +160,7 @@ export default function Navbar() {
                     </Link>
                   </li>
                   <li>
-                    <button
-                      className="dropdown-item"
-                      onClick={handleLogout}
-                    >
+                    <button className="dropdown-item" onClick={handleLogout}>
                       Logout
                     </button>
                   </li>
@@ -126,6 +171,7 @@ export default function Navbar() {
                 <Link
                   className={`nav-link ${isActive("/login")}`}
                   to="/login"
+                  onClick={() => setLoginStatus(true)} // Update login status
                 >
                   Login
                 </Link>

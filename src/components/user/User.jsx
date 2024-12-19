@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify"; // Import toast for notifications
+import "react-toastify/dist/ReactToastify.css";
 import {
   FaUser,
   FaEnvelope,
@@ -91,7 +93,7 @@ export default function User() {
       }
 
       const data = await response.json();
-      alert(data.message || "Details updated successfully!");
+      toast.success(data.message || "Details updated successfully!");
       setIsEditing(false);
       getDetails(formData.student_id); // Refresh user details
     } catch (err) {
