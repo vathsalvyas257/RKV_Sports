@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify"; // Import toast for notifications
-import "react-toastify/dist/ReactToastify.css";
 import {
   FaUser,
   FaEnvelope,
@@ -93,7 +91,7 @@ export default function User() {
       }
 
       const data = await response.json();
-      toast.success(data.message || "Details updated successfully!");
+      alert(data.message || "Details updated successfully!");
       setIsEditing(false);
       getDetails(formData.student_id); // Refresh user details
     } catch (err) {
@@ -242,7 +240,7 @@ export default function User() {
                     </div>
                   )}
                 </div>
-                <hr />
+                {/* <hr />
                 <div className="text-start ps-4">
                   <h5 className="mb-3">Teams</h5>
                   {teams.length > 0 ? (
@@ -268,7 +266,7 @@ export default function User() {
                   ) : (
                     <p>No teams found.</p>
                   )}
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

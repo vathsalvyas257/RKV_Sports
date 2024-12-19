@@ -100,14 +100,14 @@ export default function Navbar() {
                 Tournaments
               </Link>
             </li>
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <Link
                 className={`nav-link ${isActive("/livescores")}`}
                 to="/livescores"
               >
                 Live Scores
               </Link>
-            </li>
+            </li> */}
             <li className="nav-item">
               <Link className={`nav-link ${isActive("/news")}`} to="/news">
                 News

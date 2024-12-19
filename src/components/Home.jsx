@@ -5,7 +5,8 @@ import SportsContext, { SportsProvider } from "./context/SportsContext";
 import {Link} from 'react-router-dom'
 
 export default function Home() {
-  const {carouselImages,addCarouselImage}=useContext(SportsContext);
+  // const {carouselImages,addCarouselImage}=useContext(SportsContext);
+  const [carouselImages,setCarouselImages]=useState(["/0.jpg","6qyc_ylv8_230329.jpg","pexels-pixabay-46798.jpg","sportsday.jpg"]);
   // console.log(carouselImages);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imageId, setImageId] = useState("");
@@ -66,19 +67,20 @@ export default function Home() {
           {carouselImages.map((image) => (
             <div key={image.id} style={{ width: "100vw" }}>
               <img
-                src={image.banner_link}
-                alt={`Slide ${image.banner_id}`}
+                src={image}
+                alt={`images`}
                 style={{
-                  width: "100vw",
-                  height: "500px",
-                  objectFit: "cover",
+                  width: "100%",
+                  height: "auto", // Maintain aspect ratio
+                  objectFit: "cover", // Ensure images cover the entire area
+                  maxHeight: "500px", // Restrict max height to prevent stretching
                 }}
               />
             </div>
           ))}
         </Carousel>
 
-        <button
+        {/* <button
           onClick={openModal}
           style={{
             position: "absolute",
@@ -101,7 +103,7 @@ export default function Home() {
           className="btn btn-danger"
         >
           Delete Image
-        </button>
+        </button> */}
       </div>
 
       {/* Centered Modal for Adding New Images */}
@@ -162,7 +164,7 @@ export default function Home() {
       >
         <div className="col-12 col-md-6 d-flex flex-column align-items-center mb-3 mb-md-0 ">
           <img
-            src="/passport.jpg"
+            src="/dj.jpeg"
             className="card-img-top"
             alt="Profile"
             style={{
@@ -176,9 +178,9 @@ export default function Home() {
         </div>
         <div className="col-12 col-md-6">
           <p className="text-muted">
-            This is the brief description about the tournament. Join us for an
-            exciting tournament filled with action and enthusiasm. Compete,
-            showcase your skills, and be a part of this thrilling sports event!
+          Stay informed with the latest sports news and updates.
+           From breaking stories to in-depth analyses, we bring you all the important events, announcements, and exciting developments from the world of sports. Whether it's upcoming tournaments, athlete achievements, or industry trends, we've got you covered with timely and engaging content.
+           Don't miss out on any major stories or updates—stay connected with us for all the sports news you need!
             <br />
             <Link to="/news">view more</Link>
           </p>
@@ -209,7 +211,7 @@ export default function Home() {
         </div>
         <div className="col-12 col-md-6 d-flex flex-column align-items-center mb-3 mb-md-0 ">
           <img
-            src="/passport.jpg"
+            src="/cricket_bg.jpg"
             className="card-img-top"
             alt="Profile"
             style={{

@@ -23,6 +23,14 @@ export default function AdminPage() {
       setTournaments((prevTournaments) => [tournament, ...prevTournaments]);
     }
   };
+  // const handleLogout = () => {
+  //   localStorage.removeItem("accessToken");
+  //   localStorage.removeItem("student_id");
+  //   localStorage.removeItem("refreshToken");
+  //   localStorage.removeItem("user");
+  //   navigate("/login");
+  // };
+
 
   useEffect(() => {
     // Set isMounted to true when the component mounts
@@ -38,9 +46,9 @@ export default function AdminPage() {
     <div className="container mt-4 admin-page">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="text-primary">Admin Dashboard</h2>
-        <button className="btn btn-outline-primary">
+        {/* <button className="btn btn-outline-primary" onClick={handleLogout}>
           <i className="fas fa-sign-out-alt"></i> Logout
-        </button>
+        </button> */}
       </div>
 
       {/* Action Cards */}

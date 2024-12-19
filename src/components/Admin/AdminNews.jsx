@@ -209,11 +209,14 @@ export default function AdminNews({ newsList, setNewsList }) {
                   <h5
                     className="card-title "
                     style={{
-                      whiteSpace: "nowrap",
+                      maxHeight: "6rem", // Adjust height based on desired rows (approx 1.5rem per row)
                       overflow: "hidden",
                       textOverflow: "ellipsis",
-                      fontFamily: "bold",
-                      fontSize:"25px",
+                      display: "-webkit-box",
+                      WebkitLineClamp: 3, // Number of lines to display
+                      WebkitBoxOrient: "vertical",
+                      fontSize: "16px", // Adjust font size to fit the content
+                      color: "#555",
                     }}
                   >
                     {news.title}
